@@ -22,7 +22,7 @@ const Footer = () => {
   return (
     <>
       <Box
-        sx={{ backgroundColor: colors.primary, color: colors.primary, py: 3, height: "20vh" }}
+        sx={{ backgroundColor: colors.primary, color: colors.primary, height: "20vh" ,mt:2}}
       >
         <Box sx={{ width: "100%" }}>
           <Grid container rowSpacing={1} columnSpacing={{ xs: 1, sm: 2, md: 3 }} sx={{ width: "80%" }}>
@@ -60,7 +60,7 @@ const Footer = () => {
               <Typography variant="h5" sx={{ fontWeight: "bold", color: colors.black, fontFamily: "Poppins", ml: 5 }}>
                 Social Media
               </Typography>
-              <Box sx={{ width: "100%", ml: 5 }}>
+              <Box sx={{ width: "100%" }}>
                 <Grid container rowSpacing={1} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
                 <Grid item xs={1}>
                     <FacebookIcon />

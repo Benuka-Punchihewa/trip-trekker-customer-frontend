@@ -9,6 +9,8 @@ import Footer from "./components/common/Footer";
 import Hotels from "./views/Hotels";
 import Attractions from "./views/Attractions";
 import TourGuides from "./views/TourGuides";
+import './global.css';
+
 
 const theme = createTheme({
   palette: {
