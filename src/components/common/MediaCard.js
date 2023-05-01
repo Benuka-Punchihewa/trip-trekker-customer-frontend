@@ -4,8 +4,9 @@ import CardActions from "@mui/material/CardActions";
 import CardMedia from "@mui/material/CardMedia";
 import Typography from "@mui/material/Typography";
 import { Box } from "@mui/material";
+import Rectangle3 from "../../assets/Images/Rectangle3.png"
 
-const MediaCard = ({ name, contactNumber }) => {
+const MediaCard = ({ name, location }) => {
   return (
     <Card
       sx={{
@@ -19,13 +20,14 @@ const MediaCard = ({ name, contactNumber }) => {
         alt="green iguana"
         height="190"
         boxshadow="0px 8px 25px rgba(0, 0, 0, 0.25)"
-        image="https://img.freepik.com/free-photo/young-woman-pharmacist-pharmacy_1303-25541.jpg?w=2000"
+        image={Rectangle3}
       />
 
       <CardActions sx={{ height: 55 }}>
         <Box sx={{ mb: 0, textAlign: "right", fontWeight: "bold" }}>
           <Typography gutterBottom variant="h7" component="div">
-            {name}
+            {/* {name} */}
+            Name
           </Typography>
         </Box>
         <Box
@@ -41,7 +43,8 @@ const MediaCard = ({ name, contactNumber }) => {
             component="div"
             textAlign={"right"}
           >
-            {contactNumber}
+            {/* {location} */}
+            Location
           </Typography>
         </Box>
       </CardActions>

@@ -12,6 +12,7 @@ import TourGuides from "./views/TourGuides";
 import './global.css';
 import { ThemeProvider } from "@emotion/react";
 import "typeface-poppins";
+import HotelDetails from "./views/HotelDetails";
 
 
 const theme = createTheme({
@@ -41,7 +42,8 @@ root.render(
               <Route index element={<Home />} />
               <Route path="/hotels" element={<Hotels />} />
               <Route path="/attractions" element={<Attractions />} />
-              <Route path="/tourGuides" element={<TourGuides />} />        
+            <Route path="/tourGuides" element={<TourGuides />} />     
+            <Route path="/hoteldetails" element={<HotelDetails />} />    
       </Route>
       </Routes>
         <Footer />
