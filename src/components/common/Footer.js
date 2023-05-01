@@ -8,7 +8,6 @@ import InstagramIcon from "@mui/icons-material/Instagram";
 import TwitterIcon from "@mui/icons-material/Twitter";
 // import SnapchatIcon from "@mui/icons-material/Snapchat";
 import colors from "../../assets/Style/colors";
-import Banner from "../../assets/Images/Rectangle.png";
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === "dark" ? "#1A2027" : "#fff",
@@ -22,45 +21,45 @@ const Footer = () => {
   return (
     <>
       <Box
-        sx={{ backgroundColor: colors.primary, color: colors.primary, py: 3, height: "20vh" }}
+        sx={{ backgroundColor: colors.primary, color: colors.primary, height: "25vh" ,mt:2}}
       >
         <Box sx={{ width: "100%" }}>
           <Grid container rowSpacing={1} columnSpacing={{ xs: 1, sm: 2, md: 3 }} sx={{ width: "80%" }}>
             <Grid item xs={3}>
-              <Typography variant="h4" sx={{ fontWeight: "bold", color: colors.black, fontFamily: "Poppins", ml: 5 }}>
+              <Typography variant="h4" sx={{ fontWeight: "bold", color: colors.black,ml: 5 }}>
                 TripTrekker
               </Typography>
             </Grid>
             <Grid item xs={3}>
-              <Typography variant="h5" sx={{ fontWeight: "bold", color: colors.black, fontFamily: "Poppins", ml: 5 }}>
+              <Typography variant="h6" sx={{ fontWeight: "bold", color: colors.black, ml: 5 }}>
                 Home
               </Typography>
-              <Typography variant="h5" sx={{ fontWeight: "bold", color: colors.black, fontFamily: "Poppins", ml: 5 }}>
+              <Typography variant="h6" sx={{ fontWeight: "bold", color: colors.black,  ml: 5 }}>
                 Attractions
               </Typography>
-              <Typography variant="h5" sx={{ fontWeight: "bold", color: colors.black, fontFamily: "Poppins", ml: 5 }}>
+              <Typography variant="h6" sx={{ fontWeight: "bold", color: colors.black, ml: 5 }}>
                 Hotels
               </Typography>
-              <Typography variant="h5" sx={{ fontWeight: "bold", color: colors.black, fontFamily: "Poppins", ml: 5 }}>
+              <Typography variant="h6" sx={{ fontWeight: "bold", color: colors.black, ml: 5 }}>
                 Tour Guides
               </Typography>
             </Grid>
             <Grid item xs={3}>
-              <Typography variant="h5" sx={{ fontWeight: "bold", color: colors.black, fontFamily: "Poppins", ml: 5 }}>
+              <Typography variant="h6" sx={{ fontWeight: "bold", color: colors.black, ml: 5 }}>
                 Contact Us
               </Typography>
-              <Typography sx={{ fontWeight: "bold", color: colors.black, fontFamily: "Poppins", ml: 7 }}>
+              <Typography sx={{ fontWeight: "bold", color: colors.black,ml: 7 }}>
                 Phone - +94 77 125 1251
               </Typography>
-              <Typography sx={{ fontWeight: "bold", color: colors.black, fontFamily: "Poppins", ml: 7 }}>
+              <Typography sx={{ fontWeight: "bold", color: colors.black,  ml: 7 }}>
                 E-mail - triptrekker@gmail.com
               </Typography>
             </Grid>
             <Grid item xs={3}>
-              <Typography variant="h5" sx={{ fontWeight: "bold", color: colors.black, fontFamily: "Poppins", ml: 5 }}>
+              <Typography variant="h5" sx={{ fontWeight: "bold", color: colors.black, ml: 5 }}>
                 Social Media
               </Typography>
-              <Box sx={{ width: "100%", ml: 5 }}>
+              <Box sx={{ width: "100%" }}>
                 <Grid container rowSpacing={1} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
                 <Grid item xs={1}>
                     <FacebookIcon />

@@ -16,6 +16,7 @@ import Popup from "../../components/common/Popup";
 import { styled } from '@mui/material/styles';
 import Paper from '@mui/material/Paper';
 import { useNavigate } from "react-router-dom";
+import Banner from '../../assets/Images/Rectangle1.png';
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
@@ -50,13 +51,13 @@ const NavBar = () => {
     navigate("/tourGuides")
   }
   return (
-    <React.Fragment>
+    <React.Fragment>    
       <Box sx={{ flexGrow: 1 ,backgroundColor: colors.white, px: 8, py: 3 }}>
       <Grid container spacing={2}>
         <Grid item xs={6} md={2}>
          <Typography
                 variant="h4"
-                sx={{ fontWeight: "bold", color: colors.black, fontFamily:'Poppins' }}
+                sx={{ fontWeight: "bold", color: colors.black }}
               >
                 TripTrekker
               </Typography>
