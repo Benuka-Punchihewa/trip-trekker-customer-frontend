@@ -10,6 +10,8 @@ import Hotels from "./views/Hotels";
 import Attractions from "./views/Attractions";
 import TourGuides from "./views/TourGuides";
 import './global.css';
+import { ThemeProvider } from "@emotion/react";
+import "typeface-poppins";
 
 
 const theme = createTheme({
@@ -22,7 +24,7 @@ const theme = createTheme({
     },
   },
   typography: {
-    fontFamily: '"Poppins"',
+    fontFamily: "Poppins, sans-serif",
   },
 });
 
@@ -32,6 +34,7 @@ root.render(
     <>
        
     <BrowserRouter>
+       <ThemeProvider theme={theme}>
        <NavBar/>
       <Routes>
         <Route path="/">
@@ -41,7 +44,8 @@ root.render(
               <Route path="/tourGuides" element={<TourGuides />} />        
       </Route>
       </Routes>
-      <Footer/>
+        <Footer />
+        </ThemeProvider>
       </BrowserRouter>
       </>
     // </React.StrictMode>
