@@ -7,7 +7,7 @@ import CardMedia from "@mui/material/CardMedia";
 
 const PortfolioCard = ({ image }) => {
   return (
-    <Card sx={{ mx: 1 }}>
+    <Card sx={{}}>
       <CardMedia
         component="img"
         alt="green iguana"

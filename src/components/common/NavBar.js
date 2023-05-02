@@ -50,14 +50,24 @@ const NavBar = () => {
   const NavigateTourguide = () => {
     navigate("/tour-guides");
   };
+
+  const NavigateSignIn = () => {
+    navigate("sign-in");
+  };
+
   return (
     <React.Fragment>
       <Box
         sx={{
           flexGrow: 1,
-          backgroundColor: colors.white,
+          backgroundColor: "rgba(255, 255, 255, 0.8)",
           px: 8,
           py: 1,
+          position: "fixed",
+          top: 0,
+          width: "100%",
+          zIndex: 1,
+          boxShadow: "0 2px 4px rgba(0,0,0,.2)",
         }}
       >
         <Grid container spacing={2}>
@@ -121,8 +131,8 @@ const NavBar = () => {
             </Stack>
           </Grid>
           <Grid item xs={6} md={2}>
-            <Stack direction="row" spacing={2}>
-              <Avatar alt="" src="" />
+            <Stack direction="row" spacing={2} sx={{ cursor: "pointer" }}>
+              <Avatar alt="" src="" onClick={NavigateSignIn} />
             </Stack>
           </Grid>
         </Grid>

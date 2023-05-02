@@ -101,7 +101,7 @@ const Home = () => {
             </Link>
           </Grid>
           <Grid item xs={4} sx={{ px: 2 }}>
-            <Link to="/tourGuides">
+            <Link to="/tour-guides">
               <Card
                 sx={{
                   display: "flex",

@@ -14,6 +14,8 @@ import { ThemeProvider } from "@emotion/react";
 import "typeface-poppins";
 import HotelDetails from "./views/HotelDetails";
 import TourGuideDetails from "./views/TourGuideDetails";
+import SignIn from "./views/SignIn";
+import SignUp from "./views/SignUp";
 
 const theme = createTheme({
   palette: {
@@ -44,6 +46,8 @@ root.render(
             <Route path="/tour-guides" element={<TourGuides />} />
             <Route path="/hoteldetails" element={<HotelDetails />} />
             <Route path="/tour-guides/:id" element={<TourGuideDetails />} />
+            <Route path="/sign-in" element={<SignIn />} />
+            <Route path="/sign-up" element={<SignUp />} />
           </Route>
         </Routes>
         <Footer />
