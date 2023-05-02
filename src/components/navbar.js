@@ -14,12 +14,11 @@ const navbarStyles = {
     cursor: "pointer",
     fontWeight: 600,
     fontFamily: "Poppins",
-    fontSize: 24,
+    fontSize: 18,
     lineHeight: 2.0,
     letterSpacing: 0,
     textAlign: "center",
-  }
+  },
 };
 
 export default navbarStyles;
-

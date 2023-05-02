@@ -13,16 +13,16 @@ import { Box } from "@mui/system";
 import colors from "../../assets/Style/colors";
 import navbarStyles from "../../components/navbar";
 import Popup from "../../components/common/Popup";
-import { styled } from '@mui/material/styles';
-import Paper from '@mui/material/Paper';
+import { styled } from "@mui/material/styles";
+import Paper from "@mui/material/Paper";
 import { useNavigate } from "react-router-dom";
-import Banner from '../../assets/Images/Rectangle1.png';
+import Banner from "../../assets/Images/Rectangle1.png";
 
 const Item = styled(Paper)(({ theme }) => ({
-  backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
+  backgroundColor: theme.palette.mode === "dark" ? "#1A2027" : "#fff",
   ...theme.typography.body2,
   padding: theme.spacing(1),
-  textAlign: 'center',
+  textAlign: "center",
   color: theme.palette.text.secondary,
 }));
 
@@ -34,75 +34,99 @@ const NavBar = () => {
   const [inputs, setInputs] = useState();
   const handlePopupClose = () => setShowPopup(false);
   const handleRegisterPopupClose = () => setshowRegiserPopup(false);
-    const navigate = useNavigate();
-   
+  const navigate = useNavigate();
+
   const Navigatehome = () => {
     navigate("/");
-  }
-   const NavigateAttraction = () => {
+  };
+  const NavigateAttraction = () => {
     navigate("/attractions");
-  }
-  
+  };
+
   const NavigateHotles = () => {
     navigate("/hotels");
-  }
+  };
 
   const NavigateTourguide = () => {
-    navigate("/tourGuides")
-  }
+    navigate("/tour-guides");
+  };
   return (
-    <React.Fragment>    
-      <Box sx={{ flexGrow: 1 ,backgroundColor: colors.white, px: 8, py: 3 }}>
-      <Grid container spacing={2}>
-        <Grid item xs={6} md={2}>
-         <Typography
-                variant="h4"
-                sx={{ fontWeight: "bold", color: colors.black }}
-              >
-                TripTrekker
-              </Typography>
-        </Grid>
-        <Grid item xs={6} md={8}>
-          <Stack
+    <React.Fragment>
+      <Box
+        sx={{
+          flexGrow: 1,
+          backgroundColor: colors.white,
+          px: 8,
+          py: 1,
+        }}
+      >
+        <Grid container spacing={2}>
+          <Grid item xs={6} md={2}>
+            <Typography
+              variant="h4"
+              sx={{ fontWeight: "bold", color: colors.black }}
+            >
+              TripTrekker
+            </Typography>
+          </Grid>
+          <Grid item xs={6} md={8}>
+            <Stack
               direction="row"
               spacing={2}
               justifyContent="flex-start"
               alignItems="center"
-              sx={{ height: "100%" ,ml:18}}
+              sx={{ height: "100%", ml: 18 }}
             >
-               <Typography
-                sx={{ ...navbarStyles.NavbarHeading, paddingRight: 2, paddingLeft: 2 }}
+              <Typography
+                sx={{
+                  ...navbarStyles.NavbarHeading,
+                  paddingRight: 2,
+                  paddingLeft: 2,
+                }}
                 onClick={Navigatehome}
-                  >
-                    Home
-                </Typography>
-                <Typography
-                sx={{ ...navbarStyles.NavbarHeading, paddingRight: 2, paddingLeft: 2 }}
+              >
+                Home
+              </Typography>
+              <Typography
+                sx={{
+                  ...navbarStyles.NavbarHeading,
+                  paddingRight: 2,
+                  paddingLeft: 2,
+                }}
                 onClick={NavigateAttraction}
-                  >
-                    Attractions
-                </Typography>
-                <Typography
-                sx={{ ...navbarStyles.NavbarHeading, paddingRight: 2, paddingLeft: 2 }}
+              >
+                Attractions
+              </Typography>
+              <Typography
+                sx={{
+                  ...navbarStyles.NavbarHeading,
+                  paddingRight: 2,
+                  paddingLeft: 2,
+                }}
                 onClick={NavigateHotles}
-                  >
-                    Hotels
-                </Typography>
-                <Typography
-                sx={{ ...navbarStyles.NavbarHeading, ml: 5, paddingRight: 2, paddingLeft: 2 }}
-                 onClick={NavigateTourguide}
-                  >
-                    Tour Guides
-                  </Typography>
+              >
+                Hotels
+              </Typography>
+              <Typography
+                sx={{
+                  ...navbarStyles.NavbarHeading,
+                  ml: 5,
+                  paddingRight: 2,
+                  paddingLeft: 2,
+                }}
+                onClick={NavigateTourguide}
+              >
+                Tour Guides
+              </Typography>
             </Stack>
+          </Grid>
+          <Grid item xs={6} md={2}>
+            <Stack direction="row" spacing={2}>
+              <Avatar alt="" src="" />
+            </Stack>
+          </Grid>
         </Grid>
-        <Grid item xs={6} md={2}>
-           <Stack direction="row" spacing={2}>
-             <Avatar alt="" src="" />
-    </Stack>
-        </Grid>
-      </Grid>
-    </Box>
+      </Box>
     </React.Fragment>
   );
 };
