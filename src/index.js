@@ -1,4 +1,4 @@
-    import React from "react";
+import React from "react";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Home from "./views/Home";
@@ -9,11 +9,11 @@ import Footer from "./components/common/Footer";
 import Hotels from "./views/Hotels";
 import Attractions from "./views/Attractions";
 import TourGuides from "./views/TourGuides";
-import './global.css';
+import "./global.css";
 import { ThemeProvider } from "@emotion/react";
 import "typeface-poppins";
 import HotelDetails from "./views/HotelDetails";
-
+import TourGuideDetails from "./views/TourGuideDetails";
 
 const theme = createTheme({
   palette: {
@@ -31,24 +31,24 @@ const theme = createTheme({
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
-    // <React.StrictMode>
-    <>
-       
+  // <React.StrictMode>
+  <>
     <BrowserRouter>
-       <ThemeProvider theme={theme}>
-       <NavBar/>
-      <Routes>
-        <Route path="/">
-              <Route index element={<Home />} />
-              <Route path="/hotels" element={<Hotels />} />
-              <Route path="/attractions" element={<Attractions />} />
-            <Route path="/tourGuides" element={<TourGuides />} />     
-            <Route path="/hoteldetails" element={<HotelDetails />} />    
-      </Route>
-      </Routes>
+      <ThemeProvider theme={theme}>
+        <NavBar />
+        <Routes>
+          <Route path="/">
+            <Route index element={<Home />} />
+            <Route path="/hotels" element={<Hotels />} />
+            <Route path="/attractions" element={<Attractions />} />
+            <Route path="/tour-guides" element={<TourGuides />} />
+            <Route path="/hoteldetails" element={<HotelDetails />} />
+            <Route path="/tour-guides/:id" element={<TourGuideDetails />} />
+          </Route>
+        </Routes>
         <Footer />
-        </ThemeProvider>
-      </BrowserRouter>
-      </>
-    // </React.StrictMode>
+      </ThemeProvider>
+    </BrowserRouter>
+  </>
+  // </React.StrictMode>
 );
