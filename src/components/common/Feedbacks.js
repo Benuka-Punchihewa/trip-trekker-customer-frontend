@@ -9,7 +9,6 @@ const Feedbacks = () => {
         p: 2,
         boxShadow: "0px 1px 5px rgba(0, 0, 0, 0.2)",
         borderRadius: 2,
-        mx: 1,
         mt: 2,
       }}
     >

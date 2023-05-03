@@ -8,7 +8,7 @@ const popupStyles = {
   bgcolor: colors.white,
   minWidth: 300,
   boxShadow: "0px 8px 25px rgba(0, 0, 0, 0.25)",
-  borderRadius: 5,
+  borderRadius: 3,
   pt: 4,
   pb: 4,
   border: "none",
