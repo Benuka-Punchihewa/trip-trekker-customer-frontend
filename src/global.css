@@ -9,3 +9,26 @@ html, body {
   min-height: 100%;
 }
 
+.carousel{
+  display: flex;
+  justify-content: center;
+}
+
+.carousel .slide{
+  height: 100vh;
+}
+
+.carousel .slide img{
+  max-height: 100%;
+  width: auto;
+}
+
+.image{
+  margin: auto;
+  height: 100%;
+  width: auto;
+}
+
+.carousel .thumbs-wrapper {
+  display: none;
+}
