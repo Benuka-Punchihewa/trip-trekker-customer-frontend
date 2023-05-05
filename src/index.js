@@ -16,6 +16,7 @@ import HotelDetails from "./views/HotelDetails";
 import TourGuideDetails from "./views/TourGuideDetails";
 import SignIn from "./views/SignIn";
 import SignUp from "./views/SignUp";
+import AttractionDetails from "./views/AttractionDetails";
 
 // redux
 import { Provider } from "react-redux";
@@ -55,6 +56,7 @@ root.render(
                 <Route path="/attractions" element={<Attractions />} />
                 <Route path="/tour-guides" element={<TourGuides />} />
                 <Route path="/hoteldetails" element={<HotelDetails />} />
+                <Route path="/attractiondetails" element={<AttractionDetails />} />
                 <Route path="/tour-guides/:id" element={<TourGuideDetails />} />
                 <Route path="/sign-in" element={<SignIn />} />
                 <Route path="/sign-up" element={<SignUp />} />
