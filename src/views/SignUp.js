@@ -12,34 +12,51 @@ import {
   Typography,
   CircularProgress,
 } from "@mui/material";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import colors from "../assets/Style/colors";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import signUp from "../models/signUp";
+import { signUpUser } from "../service/signUp.service";
+import { popAlert } from "../utils/alerts";
+import { useDispatch } from "react-redux";
+import { authActions } from "../store/authSlice";
 
 const SignUp = () => {
-  const [userType, setUserType] = useState("customer");
-
-  const [RegInputs, setRegInputs] = useState();
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const [RegInputs, setRegInputs] = useState(signUp);
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [conError, setConError] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [selectedFile, setSelectedFile] = useState(null);
 
   const handleRegisterSubmit = async (e) => {
     e.preventDefault();
-    // setLoading(true);
+    setLoading(true);
 
-    // const response = await signUpUser(RegInputs);
+    const response = await signUpUser(RegInputs);
 
-    // if (response.success) {
-    //   response?.data &&
-    //     popAlert("Success!", response?.data, "success").then((res) => {});
-    // } else {
-    //   response?.data?.message &&
-    //     popAlert("Error!", response?.data?.message, "error");
-    //   response?.data?.data && setErrors(response.data.data);
-    // }
-    // setLoading(false);
+    console.log(RegInputs);
+    console.log(RegInputs.tourGuide);
+    if (response.success) {
+      setLoading(false);
+      dispatch(authActions.login(response.data));
+      response?.data &&
+        popAlert(
+          "Success!",
+          `Welcome, ${response.data?.user.name}!`,
+          "success"
+        ).then((res) => {
+          navigate("/");
+        });
+    } else {
+      response?.data?.message &&
+        popAlert("Error!", response?.data?.message, "error");
+      response?.data?.data && setErrors(response.data.data);
+      setLoading(false);
+    }
   };
 
   const handleClear = () => {
@@ -47,22 +64,18 @@ const SignUp = () => {
     setConfirmPassword("");
   };
 
-  const handleChange = (event) => {
-    setUserType(event.target.value);
-  };
+  useEffect(() => {
+    let unmounted = false;
 
-  //   useEffect(() => {
-  //     let unmounted = false;
-
-  //     if (RegInputs.password !== confirmPassword) {
-  //       if (!unmounted) setConError("Password does not match!");
-  //     } else {
-  //       if (!unmounted) setConError("");
-  //     }
-  //     return () => {
-  //       unmounted = true;
-  //     };
-  //   }, [confirmPassword, RegInputs.password]);
+    if (RegInputs.password !== confirmPassword) {
+      if (!unmounted) setConError("Password does not match!");
+    } else {
+      if (!unmounted) setConError("");
+    }
+    return () => {
+      unmounted = true;
+    };
+  }, [confirmPassword, RegInputs.password]);
 
   return (
     <React.Fragment>
@@ -95,23 +108,28 @@ const SignUp = () => {
             >
               Sign Up
             </Typography>
-            <form onSubmit={handleRegisterSubmit}>
+            <form onSubmit={handleRegisterSubmit} encType="multipart/form-data">
               <Box sx={{ mb: 2, m: 3 }}>
                 <Typography>Register As :</Typography>
                 <RadioGroup
                   row
                   aria-label="userType"
                   name="userType"
-                  value={userType}
-                  onChange={handleChange}
+                  value={RegInputs.type}
+                  onChange={(e) =>
+                    setRegInputs({
+                      ...RegInputs,
+                      type: e.target.value,
+                    })
+                  }
                 >
                   <FormControlLabel
-                    value="customer"
+                    value="Tourist"
                     control={<Radio />}
-                    label="Customer"
+                    label="Tourist"
                   />
                   <FormControlLabel
-                    value="tourGuide"
+                    value="Tour Guide"
                     control={<Radio />}
                     label="Tour Guide"
                   />
@@ -122,13 +140,13 @@ const SignUp = () => {
                   variant="filled"
                   label="Name"
                   fullWidth
-                  //   value={RegInputs.name}
-                  //   onChange={(e) =>
-                  //     setRegInputs({
-                  //       ...RegInputs,
-                  //       name: e.target.value,
-                  //     })
-                  //   }
+                  value={RegInputs.name}
+                  onChange={(e) =>
+                    setRegInputs({
+                      ...RegInputs,
+                      name: e.target.value,
+                    })
+                  }
                 />
                 {errors["name"] && (
                   <Typography color="error">{errors["name"]}</Typography>
@@ -140,13 +158,13 @@ const SignUp = () => {
                   variant="filled"
                   label="Address"
                   fullWidth
-                  //   value={RegInputs.address}
-                  //   onChange={(e) =>
-                  //     setRegInputs({
-                  //       ...RegInputs,
-                  //       address: e.target.value,
-                  //     })
-                  //   }
+                  value={RegInputs.address}
+                  onChange={(e) =>
+                    setRegInputs({
+                      ...RegInputs,
+                      address: e.target.value,
+                    })
+                  }
                 />
                 {errors["address"] && (
                   <Typography color="error">{errors["address"]}</Typography>
@@ -158,19 +176,71 @@ const SignUp = () => {
                   variant="filled"
                   label="Contact Number"
                   fullWidth
-                  //   value={RegInputs.contactNumber}
-                  //   onChange={(e) =>
-                  //     setRegInputs({
-                  //       ...RegInputs,
-                  //       contactNumber: e.target.value,
-                  //     })
-                  //   }
+                  value={RegInputs.mobileNumber}
+                  onChange={(e) =>
+                    setRegInputs({
+                      ...RegInputs,
+                      mobileNumber: e.target.value,
+                    })
+                  }
                 />
-                {errors["contactNumber"] && (
+                {errors["mobileNumber"] && (
                   <Typography color="error">
-                    {errors["contactNumber"]}
+                    {errors["mobileNumber"]}
                   </Typography>
                 )}
+              </Box>
+
+              <Box sx={{ mb: 2, m: 3 }}>
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                  <DatePicker
+                    disableFuture
+                    label="Birth Date"
+                    fullWidth
+                    openTo="year"
+                    views={["year", "month", "day"]}
+                    value={RegInputs.birthday}
+                    onChange={(nValue) =>
+                      setRegInputs({
+                        ...RegInputs,
+                        birthday: nValue,
+                      })
+                    }
+                    renderInput={(params) => (
+                      <TextField {...params} fullWidth />
+                    )}
+                  />
+                </LocalizationProvider>
+                {errors["birthday"] && (
+                  <Typography color="error">{errors["birthday"]}</Typography>
+                )}
+              </Box>
+
+              <Box sx={{ mb: 2, m: 3 }}>
+                <Typography>Gender :</Typography>
+                <RadioGroup
+                  row
+                  aria-label="GenderType"
+                  name="GenderType"
+                  value={RegInputs.gender}
+                  onChange={(e) =>
+                    setRegInputs({
+                      ...RegInputs,
+                      gender: e.target.value,
+                    })
+                  }
+                >
+                  <FormControlLabel
+                    value="Male"
+                    control={<Radio />}
+                    label="Male"
+                  />
+                  <FormControlLabel
+                    value="Female"
+                    control={<Radio />}
+                    label="Female"
+                  />
+                </RadioGroup>
               </Box>
 
               <Box sx={{ mb: 2, m: 3 }}>
@@ -179,13 +249,13 @@ const SignUp = () => {
                   label="E-mail"
                   type="email"
                   fullWidth
-                  //   value={RegInputs.email}
-                  //   onChange={(e) =>
-                  //     setRegInputs({
-                  //       ...RegInputs,
-                  //       email: e.target.value,
-                  //     })
-                  //   }
+                  value={RegInputs.email}
+                  onChange={(e) =>
+                    setRegInputs({
+                      ...RegInputs,
+                      email: e.target.value,
+                    })
+                  }
                 />
                 {errors["email"] && (
                   <Typography color="error">{errors["email"]}</Typography>
@@ -198,13 +268,13 @@ const SignUp = () => {
                   label="Password"
                   type="password"
                   fullWidth
-                  //   value={RegInputs.password}
-                  //   onChange={(e) =>
-                  //     setRegInputs({
-                  //       ...RegInputs,
-                  //       password: e.target.value,
-                  //     })
-                  //   }
+                  value={RegInputs.password}
+                  onChange={(e) =>
+                    setRegInputs({
+                      ...RegInputs,
+                      password: e.target.value,
+                    })
+                  }
                 />
                 {errors["password"] && (
                   <Typography color="error">{errors["password"]}</Typography>
@@ -224,29 +294,25 @@ const SignUp = () => {
               </Box>
 
               <Box sx={{ mb: 2, m: 3 }}>
-                {userType === "tourGuide" && (
+                {RegInputs.type === "Tour Guide" && (
                   <>
                     <Typography variant="h6">
-                      Tour Guide License Information
+                      Tour Guide Certificate Information
                     </Typography>
-                    <TextField
-                      sx={{ mb: 2 }}
-                      variant="filled"
-                      label="License No"
-                      type="text"
-                      fullWidth
-                      required
-                    />
+
                     <Typography sx={{ mb: 2 }}>
-                      Provide Your Tour Guide License as a PDF.
+                      Provide Your Tour Guide Certificate as a PDF.
                     </Typography>
                     <input
                       type="file"
                       accept="application/pdf"
                       onChange={(e) => {
-                        setSelectedFile(e.target.files[0]);
+                        const certificate = e.target.files[0];
+                        setRegInputs({
+                          ...RegInputs,
+                          tourGuide: { certificate: certificate },
+                        });
                       }}
-                      required
                     />
                   </>
                 )}

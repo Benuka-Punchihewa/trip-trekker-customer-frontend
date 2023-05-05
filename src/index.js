@@ -17,6 +17,14 @@ import TourGuideDetails from "./views/TourGuideDetails";
 import SignIn from "./views/SignIn";
 import SignUp from "./views/SignUp";
 
+// redux
+import { Provider } from "react-redux";
+import { PersistGate } from "redux-persist/integration/react";
+import { persistStore } from "redux-persist";
+import store from "./store";
+
+let persistor = persistStore(store);
+
 const theme = createTheme({
   palette: {
     primary: {
@@ -35,24 +43,28 @@ const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   // <React.StrictMode>
   <>
-    <BrowserRouter>
-      <ThemeProvider theme={theme}>
-        <NavBar />
-        <Routes>
-          <Route path="/">
-            <Route index element={<Home />} />
-            <Route path="/hotels" element={<Hotels />} />
-            <Route path="/attractions" element={<Attractions />} />
-            <Route path="/tour-guides" element={<TourGuides />} />
-            <Route path="/hoteldetails" element={<HotelDetails />} />
-            <Route path="/tour-guides/:id" element={<TourGuideDetails />} />
-            <Route path="/sign-in" element={<SignIn />} />
-            <Route path="/sign-up" element={<SignUp />} />
-          </Route>
-        </Routes>
-        <Footer />
-      </ThemeProvider>
-    </BrowserRouter>
+    <Provider store={store}>
+      <PersistGate loading={null} persistor={persistor}>
+        <BrowserRouter>
+          <ThemeProvider theme={theme}>
+            <NavBar />
+            <Routes>
+              <Route path="/">
+                <Route index element={<Home />} />
+                <Route path="/hotels" element={<Hotels />} />
+                <Route path="/attractions" element={<Attractions />} />
+                <Route path="/tour-guides" element={<TourGuides />} />
+                <Route path="/hoteldetails" element={<HotelDetails />} />
+                <Route path="/tour-guides/:id" element={<TourGuideDetails />} />
+                <Route path="/sign-in" element={<SignIn />} />
+                <Route path="/sign-up" element={<SignUp />} />
+              </Route>
+            </Routes>
+            <Footer />
+          </ThemeProvider>
+        </BrowserRouter>
+      </PersistGate>
+    </Provider>
   </>
   // </React.StrictMode>
 );
