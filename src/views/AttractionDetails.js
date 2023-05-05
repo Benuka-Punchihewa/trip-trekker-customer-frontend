@@ -22,6 +22,7 @@ import H5 from "../assets/Images/H5.png";
 import H6 from "../assets/Images/H6.png";
 import FeedbackForm from "../components/common/FeedbackForm";
 import Feedbacks from "../components/common/Feedbacks";
+import UptoDate from "../components/common/UptoDate";
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
@@ -31,7 +32,7 @@ const Item = styled(Paper)(({ theme }) => ({
   color: theme.palette.text.secondary,
 }));
 
-const HotelDetails = () => {
+const AttractionDetails = () => {
   const navigate = useNavigate();
   const hotelbyId = () => {
     navigate('/')
@@ -44,7 +45,7 @@ const HotelDetails = () => {
       <Grid container spacing={2}>
           <Grid item xs={6} sx={{mt:3,ml:8}}>
             <Typography variant="h3" sx={{ fontWeight: "bold", mb: 2 }}>
-              Hotel Name
+              Attraction Name
             </Typography>
             <Typography>
               Lorem ipsum dolor sit amet, consectetur adipiscing elit.
@@ -54,6 +55,13 @@ const HotelDetails = () => {
               Duis a arcu convallis, gravida purus eget, mollis diam.
             </Typography>
 
+            <Typography variant="h5" sx={{ fontWeight: "bold",mt:2}}>
+              Hours of Operation
+            </Typography>
+             <Typography variant="h5" sx={{ fontWeight: "bold",mt:2}}>
+              Accessibility Options
+            </Typography>
+                      
             <Typography variant="h4" sx={{ fontWeight: "bold",mt:2}}>
               Location
             </Typography>
@@ -61,20 +69,11 @@ const HotelDetails = () => {
               <MapGoogle/>
             </Box>
 
-             <Box>
             <Typography variant="h4" sx={{ fontWeight: "bold",mt:2}}>
-              Facilities
-            </Typography>
-              <Box>
-                <Facilities/>
-              </Box>
-            </Box> 
-
-            <Typography variant="h4" sx={{ fontWeight: "bold",mt:2}}>
-              Promotions & Offers
+              Up to Date Info
             </Typography>
             <Box sx={{mb:5}}>
-              <Promotions  />
+              <UptoDate/>
             </Box>
         </Grid>
         <Grid item xs={5} sx={{mt:3, ml:2}}>
@@ -154,4 +153,4 @@ const HotelDetails = () => {
   );
 };
 
-export default HotelDetails;
+export default AttractionDetails;

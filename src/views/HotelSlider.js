@@ -9,7 +9,7 @@ import Slider4 from "../assets/Images/Slider4.png";
 import Slider5 from "../assets/Images/Slider5.png";
 import "../global.css";
 
-const Slider = () => {
+const HotelSlider = () => {
   return (
     <Carousel infiniteLoop autoPlay>
       <div >
@@ -36,4 +36,4 @@ const Slider = () => {
   );
 };
 
-export default Slider;
+export default HotelSlider;
