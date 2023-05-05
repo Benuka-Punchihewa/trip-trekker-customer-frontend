@@ -8,30 +8,43 @@ import {
 } from "@mui/material";
 
 import colors from "../assets/Style/colors";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { authActions } from "../store/authSlice";
+import { createUser } from "../service/signIn.service";
+import { popAlert } from "../utils/alerts";
+import signIn from "../models/signIn";
 
 const SignIn = () => {
-  const [inputs, setInputs] = useState();
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const [inputs, setInputs] = useState(signIn);
 
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
 
+  console.log("error", errors);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    // const response = await createUser();
-    // if (response.success) {
-    //   setLoading(false);
-    //   dispatch(authActions.login(response.data));
-    //   response?.data &&
-    //     popAlert("Success!", response?.data, "success").then((res) => {
-    //       window.location.replace("/");
-    //     });
-    // } else {
-    //   response?.data && popAlert("Error!", response?.data, "error");
-    //   response?.data && setErrors(response.data);
-    // }
-    // setLoading(false);
+    const response = await createUser(inputs);
+    if (response.success) {
+      setLoading(false);
+      dispatch(authActions.login(response.data));
+      response?.data &&
+        popAlert(
+          "Success!",
+          `Welcome, ${response.data?.user.name}!`,
+          "success"
+        ).then((res) => {
+          navigate("/");
+        });
+    } else {
+      response?.data && popAlert("Error!", response?.data, "error");
+      response?.data && setErrors(response.data);
+    }
+    setLoading(false);
   };
 
   return (
@@ -72,13 +85,13 @@ const SignIn = () => {
                   variant="filled"
                   label="Email"
                   fullWidth
-                  // value={inputs.email}
-                  // onChange={(e) =>
-                  //   setInputs({
-                  //     ...inputs,
-                  //     email: e.target.value,
-                  //   })
-                  // }
+                  value={inputs.email}
+                  onChange={(e) =>
+                    setInputs({
+                      ...inputs,
+                      email: e.target.value,
+                    })
+                  }
                 />
                 {errors["email"] && (
                   <Typography color="error">{errors["email"]}</Typography>
@@ -92,13 +105,13 @@ const SignIn = () => {
                   label="Password"
                   type="password"
                   fullWidth
-                  // value={inputs.password}
-                  // onChange={(e) =>
-                  //   setInputs({
-                  //     ...inputs,
-                  //     password: e.target.value,
-                  //   })
-                  // }
+                  value={inputs.password}
+                  onChange={(e) =>
+                    setInputs({
+                      ...inputs,
+                      password: e.target.value,
+                    })
+                  }
                 />
                 {errors["password"] && (
                   <Typography color="error">{errors["password"]}</Typography>
@@ -116,9 +129,9 @@ const SignIn = () => {
                   variant="contained"
                   fullWidth
                   disabled={loading}
-                  style={{}}
                 >
-                  {loading ? <CircularProgress color="#28ac64" /> : "Sign In"}
+                  {/* {loading ? <CircularProgress color="#28ac64" /> : "Sign In"} */}
+                  sign in
                 </Button>
               </Box>
             </form>
