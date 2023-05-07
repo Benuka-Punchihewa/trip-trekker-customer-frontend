@@ -1,4 +1,9 @@
-html, body {
+* {
+  font-family: "Poppins", sans-serif;
+}
+
+html,
+body {
   margin: 0;
   padding: 0;
   width: 100%;
@@ -9,21 +14,21 @@ html, body {
   min-height: 100%;
 }
 
-.carousel{
+.carousel {
   display: flex;
   justify-content: center;
 }
 
-.carousel .slide{
+.carousel .slide {
   height: 100vh;
 }
 
-.carousel .slide img{
+.carousel .slide img {
   max-height: 100%;
   width: auto;
 }
 
-.image{
+.image {
   margin: auto;
   height: 100%;
   width: auto;

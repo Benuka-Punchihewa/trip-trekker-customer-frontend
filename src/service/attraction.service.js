@@ -25,3 +25,16 @@ export const getPaginatedAttractions = async (
 
   return response;
 };
+
+export const getAttractionById = async (id) => {
+  const response = await getApi()
+    .get(`/attractions/${id}`)
+    .then((res) => {
+      return buildResponse(true, res.data);
+    })
+    .catch((err) => {
+      return buildResponse(false, err.response.data, err.response.status);
+    });
+
+  return response;
+};

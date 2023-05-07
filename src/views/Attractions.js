@@ -29,8 +29,8 @@ const Attractions = () => {
     setPage(value);
   };
 
-  const handleClick = () => {
-    navigate("/attractiondetails");
+  const handleClick = (id) => {
+    navigate(`/attractions/${id}`);
   };
 
   const handleSearch = (input) => {

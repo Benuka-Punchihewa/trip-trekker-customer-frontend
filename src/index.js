@@ -49,25 +49,38 @@ root.render(
       <PersistGate loading={null} persistor={persistor}>
         <BrowserRouter>
           <ThemeProvider theme={theme}>
-            <NavBar />
-            <Routes>
-              <Route path="/">
-                <Route index element={<Home />} />
-                <Route path="/hotels" element={<Hotels />} />
-                <Route path="/attractions" element={<Attractions />} />
-                <Route path="/tour-guides" element={<TourGuides />} />
-                <Route path="/hoteldetails" element={<HotelDetails />} />
-                <Route
-                  path="/attractiondetails"
-                  element={<AttractionDetails />}
-                />
-                <Route path="/tour-guides/:id" element={<TourGuideDetails />} />
-                <Route path="/sign-in" element={<SignIn />} />
-                <Route path="/sign-up" element={<SignUp />} />
-                <Route path="/profile" element={<Profile />} />
-              </Route>
-            </Routes>
-            <Footer />
+            <div
+              style={{
+                minHeight: "100vh",
+                display: "flex",
+                flexDirection: "column",
+              }}
+            >
+              <div style={{ flexGrow: 1 }}>
+                <NavBar />
+                <Routes>
+                  <Route path="/">
+                    <Route index element={<Home />} />
+                    <Route path="/hotels" element={<Hotels />} />
+                    <Route path="/attractions" element={<Attractions />} />
+                    <Route path="/tour-guides" element={<TourGuides />} />
+                    <Route path="/hoteldetails" element={<HotelDetails />} />
+                    <Route
+                      path="/attractions/:id"
+                      element={<AttractionDetails />}
+                    />
+                    <Route
+                      path="/tour-guides/:id"
+                      element={<TourGuideDetails />}
+                    />
+                    <Route path="/sign-in" element={<SignIn />} />
+                    <Route path="/sign-up" element={<SignUp />} />
+                    <Route path="/profile" element={<Profile />} />
+                  </Route>
+                </Routes>
+              </div>
+              <Footer />
+            </div>
           </ThemeProvider>
         </BrowserRouter>
       </PersistGate>
