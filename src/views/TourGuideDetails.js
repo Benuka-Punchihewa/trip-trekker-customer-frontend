@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Typography,
   Box,
@@ -15,17 +15,31 @@ import FeedbackForm from "../components/common/FeedbackForm";
 import Feedbacks from "../components/common/Feedbacks";
 import Popup from "../components/common/Popup";
 import colors from "../assets/Style/colors";
+import { getTourGuideById } from "../service/tourGuides.service";
+import { getPortfolios } from "../service/portfolio.service";
 
 //image
 import personImage from "../assets/Images/per3.png";
 import portImg1 from "../assets/Images/po1.jpg";
 import portImg2 from "../assets/Images/po2.jpg";
+import { useParams } from "react-router";
 
 const TourGuideDetails = () => {
+  const { id } = useParams();
+
+  const [userData, setUserData] = useState("");
+  const [portfolios, setPortfolios] = useState([]);
   const [showPopup, setShowPopup] = useState(false);
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [refresh, setRefresh] = useState(false);
+  const [pagination, setPagination] = useState({
+    page: 1,
+    limit: 10,
+    orderBy: "desc",
+  });
 
   const handlePopupClose = () => {
     setShowPopup(false);
@@ -40,6 +54,61 @@ const TourGuideDetails = () => {
     e.preventDefault();
   };
 
+  //get user data
+  useEffect(() => {
+    let unmounted = false;
+
+    const fetchAndSet = async () => {
+      const response = await getTourGuideById(id);
+
+      if (response.success) {
+        if (!unmounted) {
+          setUserData(response?.data);
+        }
+      }
+    };
+
+    fetchAndSet();
+
+    return () => {
+      unmounted = true;
+    };
+  }, [id]);
+
+  //get all portfolios
+  useEffect(() => {
+    let unmounted = false;
+
+    if (!unmounted) setIsLoading(true);
+
+    const fetchAndSet = async () => {
+      const response = await getPortfolios(
+        id,
+        pagination.page,
+        pagination.limit,
+        pagination.orderBy
+      );
+
+      if (response.success) {
+        if (!response.data) return;
+        console.log(response.data);
+        setPortfolios(response.data.content);
+      } else {
+        console.error(response?.data);
+      }
+      if (!unmounted) setIsLoading(false);
+    };
+
+    fetchAndSet();
+
+    return () => {
+      unmounted = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pagination, refresh]);
+
+  console.log("user", userData);
+  console.log("portfolios", portfolios);
   return (
     <React.Fragment>
       <Box sx={{ mt: 10, px: 12 }}>
@@ -57,12 +126,23 @@ const TourGuideDetails = () => {
           </Grid>
           <Grid item xs={8}>
             <Typography variant="h5" sx={{ fontWeight: "bold" }}>
-              Guide Name
+              {userData.name}
             </Typography>
             <Typography>
               Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec vel
               egestas dolor, nec dignissim metus. Donec augue elit, rhoncus ac
               sodales id, porttitor vitae est. Donec laoreet rutrum
+            </Typography>
+            <Typography sx={{ fontWeight: "bold" }}>
+              Address: {userData.address}
+            </Typography>
+            <Typography></Typography>
+            <Typography sx={{ fontWeight: "bold" }}>
+              Contact: {userData.mobileNumber}
+            </Typography>
+            <Typography></Typography>
+            <Typography sx={{ fontWeight: "bold" }}>
+              Sex: {userData.gender}
             </Typography>
           </Grid>
         </Grid>
@@ -73,21 +153,15 @@ const TourGuideDetails = () => {
                 Guide Portfolio
               </Typography>
             </Grid>
-            <Grid item xs={4} sx={{ textAlign: "right" }}>
-              <Button
-                variant="contained"
-                size="large"
-                onClick={() => setShowPopup(true)}
-              >
-                Add New
-              </Button>
-            </Grid>
-            <Grid item xs={6}>
-              <PortfolioCard image={portImg1} />
-            </Grid>
-            <Grid item xs={6}>
-              <PortfolioCard image={portImg2} />
-            </Grid>
+            {portfolios &&
+              portfolios.map((item) => (
+                <Grid item xs={6} key={item._id}>
+                  <PortfolioCard
+                    image={item.image.firebaseStorageRef}
+                    description={item.description}
+                  />
+                </Grid>
+              ))}
           </Grid>
         </Box>
         <Grid container spacing={2} sx={{ mt: 4 }}>

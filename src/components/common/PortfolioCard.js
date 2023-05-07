@@ -4,8 +4,11 @@ import Card from "@mui/material/Card";
 import CardActions from "@mui/material/CardActions";
 import CardContent from "@mui/material/CardContent";
 import CardMedia from "@mui/material/CardMedia";
+import { useSelector } from "react-redux";
 
-const PortfolioCard = ({ image }) => {
+const PortfolioCard = ({ image, description, handleDelete, handleUpdate }) => {
+  const authState = useSelector((state) => state.auth);
+
   return (
     <Card sx={{}}>
       <CardMedia
@@ -16,18 +19,21 @@ const PortfolioCard = ({ image }) => {
       />
       <CardContent>
         <Typography variant="body2" color="text.secondary">
-          Lizards are a widespread group of squamate reptiles, with over 6,000
-          species, ranging across all continents except Antarctica
+          {description}
         </Typography>
       </CardContent>
-      <CardActions sx={{ justifyContent: "flex-end" }}>
-        <Button size="small" color="success">
-          Update
-        </Button>
-        <Button size="small" color="error">
-          Delete
-        </Button>
-      </CardActions>
+      {authState.user.type === "Tour Guide" ? (
+        <CardActions sx={{ justifyContent: "flex-end" }}>
+          <Button size="small" color="success" onClick={handleUpdate}>
+            Update
+          </Button>
+          <Button size="small" color="error" onClick={handleDelete}>
+            Delete
+          </Button>
+        </CardActions>
+      ) : (
+        ""
+      )}
     </Card>
   );
 };

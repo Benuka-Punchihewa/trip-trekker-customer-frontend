@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   Grid,
   Stack,
@@ -7,16 +7,23 @@ import {
   Button,
   CircularProgress,
   Avatar,
+  Grow,
+  Paper,
+  Popper,
+  Menu,
+  MenuItem,
+  MenuList,
 } from "@mui/material";
-
+import ClickAwayListener from "@mui/material/ClickAwayListener";
 import { Box } from "@mui/system";
 import colors from "../../assets/Style/colors";
 import navbarStyles from "../../components/navbar";
 import Popup from "../../components/common/Popup";
 import { styled } from "@mui/material/styles";
-import Paper from "@mui/material/Paper";
 import { useNavigate } from "react-router-dom";
 import Banner from "../../assets/Images/Rectangle1.png";
+import PopupState, { bindTrigger, bindMenu } from "material-ui-popup-state";
+import { useSelector } from "react-redux";
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === "dark" ? "#1A2027" : "#fff",
@@ -27,6 +34,8 @@ const Item = styled(Paper)(({ theme }) => ({
 }));
 
 const NavBar = () => {
+  const authState = useSelector((state) => state.auth);
+  console.log("auth state : ", authState);
   const [showPopup, setShowPopup] = useState(false);
   const [showRegiserPopup, setshowRegiserPopup] = useState(false);
   const [errors, setErrors] = useState({});
@@ -34,7 +43,30 @@ const NavBar = () => {
   const [inputs, setInputs] = useState();
   const handlePopupClose = () => setShowPopup(false);
   const handleRegisterPopupClose = () => setshowRegiserPopup(false);
+  const [open, setOpen] = useState(false);
+  const anchorRef = useRef < HTMLButtonElement > null;
   const navigate = useNavigate();
+
+  const handleToggle = () => {
+    setOpen((prevOpen) => !prevOpen);
+  };
+
+  const handleClose = (event) => {
+    if (anchorRef.current && anchorRef.current.contains(event.target)) {
+      return;
+    }
+
+    setOpen(false);
+  };
+
+  function handleListKeyDown(event) {
+    if (event.key === "Tab") {
+      event.preventDefault();
+      setOpen(false);
+    } else if (event.key === "Escape") {
+      setOpen(false);
+    }
+  }
 
   const Navigatehome = () => {
     navigate("/");
@@ -53,6 +85,10 @@ const NavBar = () => {
 
   const NavigateSignIn = () => {
     navigate("sign-in");
+  };
+
+  const NavigateProfile = () => {
+    navigate("profile");
   };
 
   return (
@@ -132,7 +168,22 @@ const NavBar = () => {
           </Grid>
           <Grid item xs={6} md={2}>
             <Stack direction="row" spacing={2} sx={{ cursor: "pointer" }}>
-              <Avatar alt="" src="" onClick={NavigateSignIn} />
+              <PopupState variant="popover" popupId="demo-popup-menu">
+                {(popupState) => (
+                  <React.Fragment>
+                    <Avatar variant="contained" {...bindTrigger(popupState)} />
+                    <Menu {...bindMenu(popupState)}>
+                      {authState.isLoggedIn == false ? (
+                        <MenuItem onClick={NavigateSignIn}>Sign In</MenuItem>
+                      ) : (
+                        <MenuItem onClick={NavigateProfile}>Profile</MenuItem>
+                      )}
+
+                      <MenuItem onClick={popupState.close}>Logout</MenuItem>
+                    </Menu>
+                  </React.Fragment>
+                )}
+              </PopupState>
             </Stack>
           </Grid>
         </Grid>
