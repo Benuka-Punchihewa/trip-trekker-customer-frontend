@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 
 import { Typography, Box, CardMedia } from "@mui/material";
 import guideImage from "../assets/Images/guide1.png";
@@ -8,11 +8,58 @@ import Grid from "@mui/material/Grid";
 import SearchBar from "../components/common/SearchBar";
 import MediaCard from "../components/common/MediaCard";
 import { useNavigate } from "react-router-dom";
+import { getAllTourGuides } from "../service/tourGuides.service";
 
 //images
 import per1 from "../assets/Images/per1.png";
 
 const TourGuides = () => {
+  const [pagination, setPagination] = useState({
+    page: 1,
+    limit: 10,
+    orderBy: "desc",
+  });
+  const [isLoading, setIsLoading] = useState(false);
+  const [refresh, setRefresh] = useState(false);
+  const [keyword, setKeyword] = useState("");
+  const [tourGuides, setTourGuides] = useState([]);
+  const navigate = useNavigate();
+
+  const handleItemClick = (id) => {
+    navigate(`/tour-guides/${id}`);
+  };
+
+  useEffect(() => {
+    let unmounted = false;
+
+    if (!unmounted) setIsLoading(true);
+
+    const fetchAndSet = async () => {
+      const response = await getAllTourGuides(
+        pagination.page,
+        pagination.limit,
+        pagination.orderBy,
+        keyword
+      );
+
+      if (response.success) {
+        if (!response.data) return;
+        console.log(response.data);
+        setTourGuides(response.data.content);
+      } else {
+        console.error(response?.data);
+      }
+      if (!unmounted) setIsLoading(false);
+    };
+
+    fetchAndSet();
+
+    return () => {
+      unmounted = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pagination, refresh, keyword]);
+
   return (
     <React.Fragment>
       <Box sx={{ width: "100%" }}>
@@ -50,7 +97,21 @@ const TourGuides = () => {
             }}
           >
             <Grid container spacing={4} style={{ maxWidth: 1300 }}>
-              <Grid item xs={3}>
+              {tourGuides &&
+                tourGuides.map((item) => (
+                  <Grid
+                    item
+                    xs={3}
+                    key={item._id}
+                    onClick={() => handleItemClick(item._id)}
+                  >
+                    <MediaCard image={per1} name={item.name} />
+                  </Grid>
+                ))}
+              {/* <Grid item xs={3}>
+                <MediaCard image={per1} name={"Name"} />
+              </Grid> */}
+              {/* <Grid item xs={3}>
                 <MediaCard image={per1} name={"Name"} />
               </Grid>
               <Grid item xs={3}>
@@ -58,10 +119,7 @@ const TourGuides = () => {
               </Grid>
               <Grid item xs={3}>
                 <MediaCard image={per1} name={"Name"} />
-              </Grid>
-              <Grid item xs={3}>
-                <MediaCard image={per1} name={"Name"} />
-              </Grid>
+              </Grid> */}
             </Grid>
           </Box>
         </Box>

@@ -23,6 +23,7 @@ import { Provider } from "react-redux";
 import { PersistGate } from "redux-persist/integration/react";
 import { persistStore } from "redux-persist";
 import store from "./store";
+import Profile from "./views/Profile";
 
 let persistor = persistStore(store);
 
@@ -56,10 +57,14 @@ root.render(
                 <Route path="/attractions" element={<Attractions />} />
                 <Route path="/tour-guides" element={<TourGuides />} />
                 <Route path="/hoteldetails" element={<HotelDetails />} />
-                <Route path="/attractiondetails" element={<AttractionDetails />} />
+                <Route
+                  path="/attractiondetails"
+                  element={<AttractionDetails />}
+                />
                 <Route path="/tour-guides/:id" element={<TourGuideDetails />} />
                 <Route path="/sign-in" element={<SignIn />} />
                 <Route path="/sign-up" element={<SignUp />} />
+                <Route path="/profile" element={<Profile />} />
               </Route>
             </Routes>
             <Footer />
