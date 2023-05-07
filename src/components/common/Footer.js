@@ -26,7 +26,7 @@ const Footer = () => {
           backgroundColor: colors.primary,
           color: colors.primary,
           height: "25vh",
-          mt: 2,
+          mt: 10,
         }}
       >
         <Box sx={{ width: "100%" }}>

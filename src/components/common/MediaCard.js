@@ -6,6 +6,7 @@ import Typography from "@mui/material/Typography";
 import { Box } from "@mui/material";
 import Rectangle3 from "../../assets/Images/Rectangle3.png";
 import colors from "../../assets/Style/colors";
+import NotFoundImage from "../../assets/Images/image-not-found.webp";
 
 const MediaCard = ({ name, location, image }) => {
   return (
@@ -21,7 +22,7 @@ const MediaCard = ({ name, location, image }) => {
         alt="green iguana"
         height="190"
         boxshadow="0px 8px 25px rgba(0, 0, 0, 0.15)"
-        image={image}
+        image={image || NotFoundImage}
       />
 
       <CardActions sx={{ height: 55 }}>
