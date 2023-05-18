@@ -5,8 +5,13 @@ import "../../global.css";
 const Slider = ({ images }) => {
   return (
     <Carousel infiniteLoop autoPlay>
-      {images?.map((image) => (
-        <img src={image} style={{ objectFit: "cover" }} />
+      {images?.map((image, index) => (
+        <img
+          key={index}
+          src={image}
+          style={{ objectFit: "cover" }}
+          alt={`slider image ${index}`}
+        />
       ))}
     </Carousel>
   );

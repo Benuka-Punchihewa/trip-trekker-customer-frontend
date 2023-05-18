@@ -62,3 +62,16 @@ export const updatePulseStreamRecord = async (pulseStreamRecordId, data) => {
 
   return response;
 };
+
+export const deletePulseStreamRecord = async (pulseStreamRecordId) => {
+  const response = await getApi()
+    .delete(`/pulse-stream-data/${pulseStreamRecordId}`)
+    .then((res) => {
+      return buildResponse(true, res.data);
+    })
+    .catch((err) => {
+      return buildResponse(false, err.response.data, err.response.status);
+    });
+
+  return response;
+};

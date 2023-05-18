@@ -29,9 +29,13 @@ import Slider from "../components/common/Slider";
 import { getAttractionById } from "../service/attraction.service";
 import { getDownloadURLFromFirebaseRef } from "../utils/firebase";
 import { getStrigifiedStringArrayItems } from "../utils/common";
-import { getPaginatedPulseStreamData } from "../service/pulseStreamData.service";
+import {
+  deletePulseStreamRecord,
+  getPaginatedPulseStreamData,
+} from "../service/pulseStreamData.service";
 import PulseStreamDataForm from "../components/attraction/PulseStreamDataForm";
 import Popup from "../components/common/Popup";
+import { popAlert, popDangerPrompt } from "../utils/alerts";
 
 const AttractionDetails = () => {
   const { id } = useParams();
@@ -70,7 +74,24 @@ const AttractionDetails = () => {
     setIsUpdateForm(false);
   };
 
-  const handleDelete = () => {};
+  const handleDelete = (record) => {
+    popDangerPrompt(
+      "Warning",
+      "Are you sure you want to delete this?",
+      "error"
+    ).then(async (res) => {
+      if (res.isConfirmed) {
+        const response = await deletePulseStreamRecord(record._id);
+        if (response.success) {
+          popAlert("Success!", "Successfully deleted the record!", "success");
+          setRefresh(!refresh);
+        } else {
+          response?.data &&
+            popAlert("Error!", response?.data?.message, "error");
+        }
+      }
+    });
+  };
 
   useEffect(() => {
     let unmounted = false;
@@ -108,7 +129,7 @@ const AttractionDetails = () => {
     return () => {
       unmounted = true;
     };
-  }, []);
+  }, [id]);
 
   useEffect(() => {
     let unmounted = false;
@@ -132,8 +153,6 @@ const AttractionDetails = () => {
           if (imageRef)
             record.preview = await getDownloadURLFromFirebaseRef(imageRef);
         }
-
-        console.log(pPulseStreamRecords);
 
         if (!unmounted) {
           setPulseSteamRecords(pPulseStreamRecords);

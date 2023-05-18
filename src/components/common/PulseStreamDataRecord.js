@@ -55,8 +55,7 @@ const PulseStreamDataRecord = ({
           </Typography>
         </CardContent>
         <CardActions>
-          {(authState?.user?.type === "Admin" ||
-            authState?.user?.type === "Tour Guide") && (
+          {authState?.user?._id === record?.user?._id && (
             <CardActions sx={{ justifyContent: "flex-end" }}>
               <Button
                 size="small"
@@ -65,7 +64,11 @@ const PulseStreamDataRecord = ({
               >
                 Update
               </Button>
-              <Button size="small" color="error" onClick={onDeleteClick}>
+              <Button
+                size="small"
+                color="error"
+                onClick={() => onDeleteClick(record)}
+              >
                 Delete
               </Button>
             </CardActions>
