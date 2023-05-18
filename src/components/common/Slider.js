@@ -6,7 +6,7 @@ const Slider = ({ images }) => {
   return (
     <Carousel infiniteLoop autoPlay>
       {images?.map((image) => (
-        <img src={image} />
+        <img src={image} style={{ objectFit: "cover" }} />
       ))}
     </Carousel>
   );
