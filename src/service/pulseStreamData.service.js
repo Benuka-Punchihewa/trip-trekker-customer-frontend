@@ -1,4 +1,4 @@
-import { getApi } from "../utils/axios";
+import { getApi, getApiForFormData } from "../utils/axios";
 import { buildResponse } from "../utils/responseBuilder";
 
 export const getPaginatedPulseStreamData = async (
@@ -15,6 +15,25 @@ export const getPaginatedPulseStreamData = async (
         orderBy,
       },
     })
+    .then((res) => {
+      return buildResponse(true, res.data);
+    })
+    .catch((err) => {
+      return buildResponse(false, err.response.data, err.response.status);
+    });
+
+  return response;
+};
+
+export const createPulseStreamRecord = async (attractionId, data) => {
+  const { image } = data;
+
+  const formData = new FormData();
+  formData.append("strigifiedBody", JSON.stringify(data));
+  formData.append("file", image);
+
+  const response = await getApiForFormData()
+    .post(`/pulse-stream-data/attractions/${attractionId}`, formData)
     .then((res) => {
       return buildResponse(true, res.data);
     })

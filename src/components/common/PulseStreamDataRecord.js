@@ -13,7 +13,7 @@ import { getTimePassed } from "../../utils/common";
 
 const PulseStreamDataRecord = ({ author, createdAt, description, image }) => {
   return (
-    <Box sx={{ mt: 1 }}>
+    <Box sx={{ mb: 1 }}>
       <Card sx={{ maxWidth: 750 }}>
         <CardMedia
           component="img"

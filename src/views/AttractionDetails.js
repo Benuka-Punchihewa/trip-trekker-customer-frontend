@@ -1,8 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { Typography, Box, Grid, CircularProgress } from "@mui/material";
-import { styled } from "@mui/material/styles";
-import Paper from "@mui/material/Paper";
-import { useNavigate, useParams } from "react-router-dom";
+import {
+  Typography,
+  Box,
+  Grid,
+  CircularProgress,
+  Button,
+  Pagination,
+} from "@mui/material";
+import { useParams } from "react-router-dom";
 import MapGoogle from "../components/common/MapGoogle";
 import MiniCard from "../components/common/MiniCard";
 import M1 from "../assets/Images/M1.png";
@@ -25,14 +30,8 @@ import { getAttractionById } from "../service/attraction.service";
 import { getDownloadURLFromFirebaseRef } from "../utils/firebase";
 import { getStrigifiedStringArrayItems } from "../utils/common";
 import { getPaginatedPulseStreamData } from "../service/pulseStreamData.service";
-
-const Item = styled(Paper)(({ theme }) => ({
-  backgroundColor: theme.palette.mode === "dark" ? "#1A2027" : "#fff",
-  ...theme.typography.body2,
-  padding: theme.spacing(1),
-  textAlign: "center",
-  color: theme.palette.text.secondary,
-}));
+import PulseStreamDataForm from "../components/attraction/PulseStreamDataForm";
+import Popup from "../components/common/Popup";
 
 const AttractionDetails = () => {
   const { id } = useParams();
@@ -41,8 +40,22 @@ const AttractionDetails = () => {
   const [attraction, setAttraction] = useState({});
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
-  const [keyword, setKeyword] = useState("");
   const [pulseStreamRecords, setPulseSteamRecords] = useState([]);
+  const [showPopup, setShowPopup] = useState(true);
+  const [refresh, setRefresh] = useState(false);
+
+  const handlePageChange = (event, value) => {
+    setPage(value);
+  };
+
+  const handlePopupClose = () => {
+    setShowPopup(false);
+  };
+
+  const handlePopupSuccess = () => {
+    setRefresh(!refresh);
+    setShowPopup(false);
+  };
 
   useEffect(() => {
     let unmounted = false;
@@ -122,7 +135,7 @@ const AttractionDetails = () => {
     return () => {
       unmounted = true;
     };
-  }, [attraction, page, keyword]);
+  }, [refresh, attraction, page]);
 
   if (isAttractionLoading && isPulseStreamLoading)
     return (
@@ -139,135 +152,175 @@ const AttractionDetails = () => {
       </Box>
     );
   return (
-    <Box sx={{ width: "100%" }}>
-      <Slider images={attraction.previewImages} />
+    <>
+      <Box sx={{ width: "100%" }}>
+        <Slider images={attraction.previewImages} />
 
-      <Box sx={{ flexGrow: 1 }}>
-        <Grid container spacing={2}>
-          <Grid item xs={6} sx={{ mt: 3, ml: 8 }}>
-            <Typography variant="h3" sx={{ fontWeight: "bold", mb: 2 }}>
-              {attraction?.name}
-            </Typography>
-            <Typography>{attraction?.description}</Typography>
+        <Box sx={{ flexGrow: 1 }}>
+          <Grid container spacing={2}>
+            <Grid item xs={6} sx={{ mt: 3, ml: 8 }}>
+              <Typography variant="h3" sx={{ fontWeight: "bold", mb: 2 }}>
+                {attraction?.name}
+              </Typography>
+              <Typography>{attraction?.description}</Typography>
 
-            <Typography variant="h5" sx={{ fontWeight: "bold", mt: 2 }}>
-              Hours of Operation
-            </Typography>
-            <Typography>
-              {new Date(attraction.openHours?.open).toLocaleString("en-US", {
-                hour: "numeric",
-                minute: "numeric",
-                hour12: true,
-              })}{" "}
-              to{" "}
-              {new Date(attraction.openHours?.close).toLocaleString("en-US", {
-                hour: "numeric",
-                minute: "numeric",
-                hour12: true,
-              })}
-            </Typography>
+              <Typography variant="h5" sx={{ fontWeight: "bold", mt: 2 }}>
+                Hours of Operation
+              </Typography>
+              <Typography>
+                {new Date(attraction.openHours?.open).toLocaleString("en-US", {
+                  hour: "numeric",
+                  minute: "numeric",
+                  hour12: true,
+                })}{" "}
+                to{" "}
+                {new Date(attraction.openHours?.close).toLocaleString("en-US", {
+                  hour: "numeric",
+                  minute: "numeric",
+                  hour12: true,
+                })}
+              </Typography>
 
-            <Typography variant="h5" sx={{ fontWeight: "bold", mt: 2 }}>
-              Accessibility Options
-            </Typography>
-            <Typography>
-              {getStrigifiedStringArrayItems(attraction.accessibilityOptions)}
-            </Typography>
+              <Typography variant="h5" sx={{ fontWeight: "bold", mt: 2 }}>
+                Accessibility Options
+              </Typography>
+              <Typography>
+                {getStrigifiedStringArrayItems(attraction.accessibilityOptions)}
+              </Typography>
 
-            <Typography variant="h4" sx={{ fontWeight: "bold", mt: 2 }}>
-              Location
-            </Typography>
-            <Box>
-              <MapGoogle
-                lat={attraction?.location?.coordinates[1]}
-                lng={attraction?.location?.coordinates[0]}
-              />
-            </Box>
-
-            <Typography variant="h4" sx={{ fontWeight: "bold", mt: 2 }}>
-              Pulse Stream
-            </Typography>
-            <Box sx={{ mb: 5 }}>
-              {pulseStreamRecords?.map((record) => (
-                <PulseStreamDataRecord
-                  key={record._id}
-                  author={record.user.name}
-                  createdAt={record.createdAt}
-                  description={record.description}
-                  image={record.preview}
+              <Typography variant="h4" sx={{ fontWeight: "bold", mt: 2 }}>
+                Location
+              </Typography>
+              <Box>
+                <MapGoogle
+                  lat={attraction?.location?.coordinates[1]}
+                  lng={attraction?.location?.coordinates[0]}
                 />
-              ))}
-            </Box>
-          </Grid>
-          <Grid item xs={5} sx={{ mt: 3, ml: 2 }}>
-            <Typography variant="h4" sx={{ fontWeight: "bold", mb: 2 }}>
-              Nearby Attractions
-            </Typography>
-            <Box sx={{ mb: 5 }}>
-              <Box sx={{ flexGrow: 1 }}>
-                <Grid container spacing={2}>
-                  <Grid item xs={4}>
-                    <MiniCard image={M1} name={"Name"} />
-                  </Grid>
-                  <Grid item xs={4}>
-                    <MiniCard image={M2} name={"Name"} />
-                  </Grid>
-                  <Grid item xs={4}>
-                    <MiniCard image={M3} name={"Name"} />
-                  </Grid>
-                  <Grid item xs={4}>
-                    <MiniCard image={M4} name={"Name"} />
-                  </Grid>
-                  <Grid item xs={4}>
-                    <MiniCard image={M5} name={"Name"} />
-                  </Grid>
-                  <Grid item xs={4}>
-                    <MiniCard image={M6} name={"Name"} />
-                  </Grid>
-                </Grid>
               </Box>
-            </Box>
 
-            <Typography variant="h4" sx={{ fontWeight: "bold", mb: 2 }}>
-              Nearby Hotels
-            </Typography>
-            <Box sx={{ mb: 5 }}>
-              <Box sx={{ flexGrow: 1 }}>
-                <Grid container spacing={2}>
-                  <Grid item xs={4}>
-                    <MiniCard image={H1} name={"Name"} />
-                  </Grid>
-                  <Grid item xs={4}>
-                    <MiniCard image={H2} name={"Name"} />
-                  </Grid>
-                  <Grid item xs={4}>
-                    <MiniCard image={H3} name={"Name"} />
-                  </Grid>
-                  <Grid item xs={4}>
-                    <MiniCard image={H4} name={"Name"} />
-                  </Grid>
-                  <Grid item xs={4}>
-                    <MiniCard image={H5} name={"Name"} />
-                  </Grid>
-                  <Grid item xs={4}>
-                    <MiniCard image={H6} name={"Name"} />
-                  </Grid>
-                </Grid>
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  mt: 3,
+                  mb: 2,
+                }}
+              >
+                <Typography variant="h4" sx={{ fontWeight: "bold" }}>
+                  Pulse Stream
+                </Typography>
+                <Button
+                  variant="contained"
+                  size="large"
+                  onClick={() => setShowPopup(true)}
+                >
+                  Add New
+                </Button>
               </Box>
-            </Box>
-            <Typography variant="h4" sx={{ fontWeight: "bold", mb: 2 }}>
-              Ratings & Reviews
-            </Typography>
-            <Box>
-              <FeedbackForm />
-              <Feedbacks />
-              <Feedbacks />
-              <Feedbacks />
-            </Box>
+
+              <Box sx={{ mb: 5 }}>
+                {pulseStreamRecords?.map((record) => (
+                  <PulseStreamDataRecord
+                    key={record._id}
+                    author={record.user.name}
+                    createdAt={record.createdAt}
+                    description={record.description}
+                    image={record.preview}
+                  />
+                ))}
+
+                <Box sx={{ mt: 2 }}>
+                  <Pagination
+                    count={totalPages}
+                    page={page}
+                    onChange={handlePageChange}
+                    fontWeight={"bold"}
+                  />
+                </Box>
+              </Box>
+            </Grid>
+            <Grid item xs={5} sx={{ mt: 3, ml: 2 }}>
+              <Typography variant="h4" sx={{ fontWeight: "bold", mb: 2 }}>
+                Nearby Attractions
+              </Typography>
+              <Box sx={{ mb: 5 }}>
+                <Box sx={{ flexGrow: 1 }}>
+                  <Grid container spacing={2}>
+                    <Grid item xs={4}>
+                      <MiniCard image={M1} name={"Name"} />
+                    </Grid>
+                    <Grid item xs={4}>
+                      <MiniCard image={M2} name={"Name"} />
+                    </Grid>
+                    <Grid item xs={4}>
+                      <MiniCard image={M3} name={"Name"} />
+                    </Grid>
+                    <Grid item xs={4}>
+                      <MiniCard image={M4} name={"Name"} />
+                    </Grid>
+                    <Grid item xs={4}>
+                      <MiniCard image={M5} name={"Name"} />
+                    </Grid>
+                    <Grid item xs={4}>
+                      <MiniCard image={M6} name={"Name"} />
+                    </Grid>
+                  </Grid>
+                </Box>
+              </Box>
+
+              <Typography variant="h4" sx={{ fontWeight: "bold", mb: 2 }}>
+                Nearby Hotels
+              </Typography>
+              <Box sx={{ mb: 5 }}>
+                <Box sx={{ flexGrow: 1 }}>
+                  <Grid container spacing={2}>
+                    <Grid item xs={4}>
+                      <MiniCard image={H1} name={"Name"} />
+                    </Grid>
+                    <Grid item xs={4}>
+                      <MiniCard image={H2} name={"Name"} />
+                    </Grid>
+                    <Grid item xs={4}>
+                      <MiniCard image={H3} name={"Name"} />
+                    </Grid>
+                    <Grid item xs={4}>
+                      <MiniCard image={H4} name={"Name"} />
+                    </Grid>
+                    <Grid item xs={4}>
+                      <MiniCard image={H5} name={"Name"} />
+                    </Grid>
+                    <Grid item xs={4}>
+                      <MiniCard image={H6} name={"Name"} />
+                    </Grid>
+                  </Grid>
+                </Box>
+              </Box>
+              <Typography variant="h4" sx={{ fontWeight: "bold", mb: 2 }}>
+                Ratings & Reviews
+              </Typography>
+              <Box>
+                <FeedbackForm />
+                <Feedbacks />
+                <Feedbacks />
+                <Feedbacks />
+              </Box>
+            </Grid>
           </Grid>
-        </Grid>
+        </Box>
       </Box>
-    </Box>
+
+      <Popup
+        title="Create Pulse Stream Record"
+        width={800}
+        show={showPopup}
+        onClose={handlePopupClose}
+      >
+        <PulseStreamDataForm
+          attractionId={attraction._id}
+          onSuccess={handlePopupSuccess}
+        />
+      </Popup>
+    </>
   );
 };
 
