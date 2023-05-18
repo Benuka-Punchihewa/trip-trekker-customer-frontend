@@ -8,10 +8,17 @@ import {
   Typography,
 } from "@mui/material";
 import Grid from "@mui/material/Grid";
-import AttractionCard2 from "../../assets/Images/AttractionCard2.png";
 import { getTimePassed } from "../../utils/common";
+import { useSelector } from "react-redux";
 
-const PulseStreamDataRecord = ({ author, createdAt, description, image }) => {
+const PulseStreamDataRecord = ({
+  record,
+  image,
+  onUpdateClick,
+  onDeleteClick,
+}) => {
+  const authState = useSelector((state) => state.auth);
+
   return (
     <Box sx={{ mb: 1 }}>
       <Card sx={{ maxWidth: 750 }}>
@@ -27,7 +34,7 @@ const PulseStreamDataRecord = ({ author, createdAt, description, image }) => {
             <Grid container spacing={2}>
               <Grid item xs={8}>
                 <Typography gutterBottom variant="h6" component="div">
-                  {author}
+                  {record?.user?.name}
                 </Typography>
               </Grid>
               <Grid item xs={4}>
@@ -37,17 +44,33 @@ const PulseStreamDataRecord = ({ author, createdAt, description, image }) => {
                   component="div"
                   textAlign={"right"}
                 >
-                  {getTimePassed(createdAt)}
+                  {getTimePassed(record.updatedAt)}
                 </Typography>
               </Grid>
             </Grid>
           </Box>
 
           <Typography variant="body2" color="text.secondary">
-            {description}
+            {record.description}
           </Typography>
         </CardContent>
-        <CardActions></CardActions>
+        <CardActions>
+          {(authState?.user?.type === "Admin" ||
+            authState?.user?.type === "Tour Guide") && (
+            <CardActions sx={{ justifyContent: "flex-end" }}>
+              <Button
+                size="small"
+                color="success"
+                onClick={() => onUpdateClick(record)}
+              >
+                Update
+              </Button>
+              <Button size="small" color="error" onClick={onDeleteClick}>
+                Delete
+              </Button>
+            </CardActions>
+          )}
+        </CardActions>
       </Card>
     </Box>
   );

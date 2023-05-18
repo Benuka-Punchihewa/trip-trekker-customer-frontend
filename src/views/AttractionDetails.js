@@ -41,8 +41,10 @@ const AttractionDetails = () => {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
   const [pulseStreamRecords, setPulseSteamRecords] = useState([]);
-  const [showPopup, setShowPopup] = useState(true);
+  const [showPopup, setShowPopup] = useState(false);
   const [refresh, setRefresh] = useState(false);
+  const [isUpdateForm, setIsUpdateForm] = useState(false);
+  const [activePulseRecord, setActivePulseRecord] = useState(null);
 
   const handlePageChange = (event, value) => {
     setPage(value);
@@ -56,6 +58,19 @@ const AttractionDetails = () => {
     setRefresh(!refresh);
     setShowPopup(false);
   };
+
+  const handleShowUpdatePopup = (record) => {
+    setShowPopup(true);
+    setIsUpdateForm(true);
+    setActivePulseRecord(record);
+  };
+
+  const handleShowAddPopup = () => {
+    setShowPopup(true);
+    setIsUpdateForm(false);
+  };
+
+  const handleDelete = () => {};
 
   useEffect(() => {
     let unmounted = false;
@@ -154,7 +169,7 @@ const AttractionDetails = () => {
   return (
     <>
       <Box sx={{ width: "100%" }}>
-        <Slider images={attraction.previewImages} />
+        <Slider images={attraction?.previewImages} />
 
         <Box sx={{ flexGrow: 1 }}>
           <Grid container spacing={2}>
@@ -212,7 +227,7 @@ const AttractionDetails = () => {
                 <Button
                   variant="contained"
                   size="large"
-                  onClick={() => setShowPopup(true)}
+                  onClick={handleShowAddPopup}
                 >
                   Add New
                 </Button>
@@ -222,10 +237,10 @@ const AttractionDetails = () => {
                 {pulseStreamRecords?.map((record) => (
                   <PulseStreamDataRecord
                     key={record._id}
-                    author={record.user.name}
-                    createdAt={record.createdAt}
-                    description={record.description}
+                    record={record}
                     image={record.preview}
+                    onUpdateClick={handleShowUpdatePopup}
+                    onDeleteClick={handleDelete}
                   />
                 ))}
 
@@ -318,6 +333,8 @@ const AttractionDetails = () => {
         <PulseStreamDataForm
           attractionId={attraction._id}
           onSuccess={handlePopupSuccess}
+          isUpdate={isUpdateForm}
+          pulseStreamRecord={activePulseRecord}
         />
       </Popup>
     </>

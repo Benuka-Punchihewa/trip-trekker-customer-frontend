@@ -1,5 +1,5 @@
 import pulseStreamData from "../../models/pulseStramData";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Typography,
   Box,
@@ -13,13 +13,22 @@ import {
   MenuItem,
 } from "@mui/material";
 import colors from "../../assets/Style/colors";
-import { createPulseStreamRecord } from "../../service/pulseStreamData.service";
+import {
+  createPulseStreamRecord,
+  updatePulseStreamRecord,
+} from "../../service/pulseStreamData.service";
 import { popAlert } from "../../utils/alerts";
 
-const PulseStreamDataForm = ({ attractionId, onSuccess }) => {
+const PulseStreamDataForm = ({
+  attractionId,
+  onSuccess,
+  isUpdate,
+  pulseStreamRecord,
+}) => {
   const [isLoading, setIsLoading] = useState(false);
   const [inputs, setInputs] = useState(pulseStreamData);
   const [errors, setErrors] = useState({});
+  const [preview, setPreview] = useState("");
 
   const handleClear = () => {
     setInputs(pulseStreamData);
@@ -29,7 +38,10 @@ const PulseStreamDataForm = ({ attractionId, onSuccess }) => {
     e.preventDefault();
     setIsLoading(true);
 
-    const response = await createPulseStreamRecord(attractionId, inputs);
+    let response;
+    if (isUpdate)
+      response = await updatePulseStreamRecord(pulseStreamRecord._id, inputs);
+    else response = await createPulseStreamRecord(attractionId, inputs);
 
     if (response.success) {
       response?.data &&
@@ -44,17 +56,47 @@ const PulseStreamDataForm = ({ attractionId, onSuccess }) => {
     }
   };
 
+  useEffect(() => {
+    let unmounted = false;
+    if (!pulseStreamRecord) return;
+
+    if (!unmounted && isUpdate) {
+      setInputs({
+        ...pulseStreamData,
+        tag: pulseStreamRecord.tag,
+        description: pulseStreamRecord.description,
+      });
+      setPreview(pulseStreamRecord.preview);
+    }
+
+    return () => {
+      unmounted = true;
+    };
+  }, [pulseStreamRecord, isUpdate]);
+
   return (
     <Box sx={{ mb: 2 }}>
       <form onSubmit={handleSubmit}>
         <Box sx={{ mb: 2 }}>
-          <Input
-            sx={{ mb: 2 }}
-            fullWidth
-            type="file"
-            onChange={(e) => setInputs({ ...inputs, image: e.target.files[0] })}
-          />
-
+          <Box sx={{ mb: 2 }}>
+            <Input
+              sx={{ mb: 1 }}
+              fullWidth
+              type="file"
+              onChange={(e) => {
+                setInputs({ ...inputs, image: e.target.files[0] });
+                setPreview(window.URL.createObjectURL(e.target.files[0]));
+              }}
+            />
+            {preview && (
+              <img
+                src={preview}
+                alt="pulse stream record image"
+                height={100}
+                style={{ objectFit: "cover" }}
+              />
+            )}
+          </Box>
           <FormControl fullWidth sx={{ mb: 2 }}>
             <InputLabel id="demo-simple-select-label">Tag</InputLabel>
             <Select

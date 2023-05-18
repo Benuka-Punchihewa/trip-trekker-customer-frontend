@@ -15,7 +15,7 @@ const MapGoogle = ({ lat, lng }) => {
       {isLoaded && (
         <GoogleMap
           center={{ lat, lng }}
-          zoom={8}
+          zoom={15}
           mapContainerClassName="map-container"
           margin={[50, 50, 50, 50]}
           options={{ zoomControl: true }}

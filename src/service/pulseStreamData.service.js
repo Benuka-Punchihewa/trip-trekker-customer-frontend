@@ -43,3 +43,22 @@ export const createPulseStreamRecord = async (attractionId, data) => {
 
   return response;
 };
+
+export const updatePulseStreamRecord = async (pulseStreamRecordId, data) => {
+  const { image } = data;
+
+  const formData = new FormData();
+  formData.append("strigifiedBody", JSON.stringify(data));
+  formData.append("file", image);
+
+  const response = await getApiForFormData()
+    .patch(`/pulse-stream-data/${pulseStreamRecordId}`, formData)
+    .then((res) => {
+      return buildResponse(true, res.data);
+    })
+    .catch((err) => {
+      return buildResponse(false, err.response.data, err.response.status);
+    });
+
+  return response;
+};
