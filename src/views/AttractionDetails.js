@@ -7,7 +7,7 @@ import {
   Button,
   Pagination,
 } from "@mui/material";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import MapGoogle from "../components/common/MapGoogle";
 import MiniCard from "../components/common/MiniCard";
 import M1 from "../assets/Images/M1.png";
@@ -26,9 +26,12 @@ import FeedbackForm from "../components/common/FeedbackForm";
 import Feedbacks from "../components/common/Feedbacks";
 import PulseStreamDataRecord from "../components/common/PulseStreamDataRecord";
 import Slider from "../components/common/Slider";
-import { getAttractionById } from "../service/attraction.service";
+import {
+  getAttractionById,
+  getNearestAttractions,
+} from "../service/attraction.service";
 import { getDownloadURLFromFirebaseRef } from "../utils/firebase";
-import { getStrigifiedStringArrayItems } from "../utils/common";
+import { covertToKm, getStrigifiedStringArrayItems } from "../utils/common";
 import {
   deletePulseStreamRecord,
   getPaginatedPulseStreamData,
@@ -43,6 +46,7 @@ import {
 
 const AttractionDetails = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const scrollElmRef = useRef(null);
   const [attractionState, setAttractionState] = useState({
     isLoading: true,
@@ -70,6 +74,10 @@ const AttractionDetails = () => {
   const [ratingFormState, setRatingFormState] = useState({
     isUpdateForm: false,
     activeRating: null,
+  });
+  const [nearestAttractionsState, setNearestAttractionsState] = useState({
+    isLoading: false,
+    content: [],
   });
 
   const handlePulseStreamPageChange = (event, value) => {
@@ -327,6 +335,63 @@ const AttractionDetails = () => {
     ]
   );
 
+  // nearest attractions
+  useEffect(
+    () => {
+      let unmounted = false;
+      const coordinates = attractionState?.attraction?.location?.coordinates;
+      if (!coordinates || coordinates.length <= 0) return;
+
+      const fetchAndSet = async () => {
+        setNearestAttractionsState({
+          ...nearestAttractionsState,
+          isLoading: true,
+        });
+        const response = await getNearestAttractions(
+          attractionState.attraction.location.coordinates[1],
+          attractionState.attraction.location.coordinates[0],
+          7
+        );
+
+        if (response.success) {
+          const content = response.data || [];
+
+          // remove this attraction
+          const thisIndex = content.findIndex(
+            (item) => item._id === attractionState.attraction?._id
+          );
+          if (thisIndex !== -1) content.splice(thisIndex, 1);
+
+          for (const item of content) {
+            if (!item?.images || item.images.length <= 0) continue;
+
+            const imageRef = item?.images[0]?.firebaseStorageRef;
+            if (imageRef)
+              item.preview = await getDownloadURLFromFirebaseRef(imageRef);
+          }
+
+          if (!unmounted) {
+            setNearestAttractionsState({
+              ...nearestAttractionsState,
+              content,
+              isLoading: false,
+            });
+          }
+        } else {
+          console.log(response.data);
+        }
+      };
+
+      fetchAndSet();
+
+      return () => {
+        unmounted = true;
+      };
+    },
+    // eslint-disable-next-line
+    [attractionState.attraction]
+  );
+
   if (attractionState.isLoading)
     return (
       <Box
@@ -421,7 +486,7 @@ const AttractionDetails = () => {
                   sx={{
                     width: "100%",
                     display: "flex",
-                    justifyContent: "center",
+                    justifyContent: "left",
                     alignItems: "center",
                     my: 2,
                   }}
@@ -456,27 +521,39 @@ const AttractionDetails = () => {
               <Typography variant="h4" sx={{ fontWeight: "bold", mb: 2 }}>
                 Nearby Attractions
               </Typography>
+              {nearestAttractionsState.isLoading && (
+                <Box
+                  sx={{
+                    width: "100%",
+                    display: "flex",
+                    justifyContent: "left",
+                    alignItems: "center",
+                    my: 2,
+                  }}
+                >
+                  <CircularProgress />{" "}
+                  <span style={{ marginLeft: 10 }}>Loading...</span>
+                </Box>
+              )}
               <Box sx={{ mb: 5 }}>
                 <Box sx={{ flexGrow: 1 }}>
                   <Grid container spacing={2}>
-                    <Grid item xs={4}>
-                      <MiniCard image={M1} name={"Name"} />
-                    </Grid>
-                    <Grid item xs={4}>
-                      <MiniCard image={M2} name={"Name"} />
-                    </Grid>
-                    <Grid item xs={4}>
-                      <MiniCard image={M3} name={"Name"} />
-                    </Grid>
-                    <Grid item xs={4}>
-                      <MiniCard image={M4} name={"Name"} />
-                    </Grid>
-                    <Grid item xs={4}>
-                      <MiniCard image={M5} name={"Name"} />
-                    </Grid>
-                    <Grid item xs={4}>
-                      <MiniCard image={M6} name={"Name"} />
-                    </Grid>
+                    {nearestAttractionsState.content?.map((attraction) => (
+                      <Grid
+                        item
+                        xs={4}
+                        key={attraction._id}
+                        onClick={() =>
+                          navigate(`/attractions/${attraction._id}`)
+                        }
+                      >
+                        <MiniCard
+                          image={attraction.preview}
+                          name={attraction.name}
+                          distance={covertToKm(attraction.distance)}
+                        />
+                      </Grid>
+                    ))}
                   </Grid>
                 </Box>
               </Box>
@@ -524,7 +601,7 @@ const AttractionDetails = () => {
                   sx={{
                     width: "100%",
                     display: "flex",
-                    justifyContent: "center",
+                    justifyContent: "left",
                     alignItems: "center",
                     my: 2,
                   }}

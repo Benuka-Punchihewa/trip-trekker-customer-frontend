@@ -3,50 +3,64 @@ import Card from "@mui/material/Card";
 import CardActions from "@mui/material/CardActions";
 import CardMedia from "@mui/material/CardMedia";
 import Typography from "@mui/material/Typography";
-import { Box } from "@mui/material";
+import { Box, CardContent } from "@mui/material";
 import Rectangle3 from "../../assets/Images/Rectangle3.png";
 import colors from "../../assets/Style/colors";
 
-const MiniCard = ({ name, location, image }) => {
+const MiniCard = ({ name, distance = 20, image }) => {
   return (
     <Card
       sx={{
         borderRadius: 2,
         boxShadow: "0px 8px 25px rgba(0, 0, 0, 0.25)",
-        "&:hover": { backgroundColor: colors.primary },
+        cursor: "pointer",
       }}
     >
       <CardMedia
         component="img"
         alt="green iguana"
-        height="100"
+        height="150"
         boxshadow="0px 8px 25px rgba(0, 0, 0, 0.15)"
         image={image}
       />
 
-      <CardActions sx={{ height: 20 }}>
-        <Box sx={{ mb: 0, fontWeight: "bold" }}>
-          <Typography gutterBottom variant="h7" component="div" justifyContent={'center'} sx={{ ml:8 }}>
-            {name}
-          </Typography>
-        </Box>
-        <Box
+      <CardContent
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          height: "fit-content",
+          py: 1,
+          "&:last-child": {
+            paddingBottom: 0,
+          },
+        }}
+      >
+        <Typography
+          gutterBottom
+          variant="h7"
+          justifyContent={"center"}
+          textAlign="left"
           sx={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
+            whiteSpace: "nowrap",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
           }}
         >
-          <Typography
-            gutterBottom
-            variant="h7"
-            component="div"
-            textAlign={"right"}
-          >
-            {location}
-          </Typography>
-        </Box>
-      </CardActions>
+          {name}
+        </Typography>
+
+        <Typography
+          gutterBottom
+          variant="h7"
+          textAlign={"right"}
+          sx={{
+            whiteSpace: "nowrap",
+            color: colors.grey,
+          }}
+        >
+          {distance} km
+        </Typography>
+      </CardContent>
     </Card>
   );
 };

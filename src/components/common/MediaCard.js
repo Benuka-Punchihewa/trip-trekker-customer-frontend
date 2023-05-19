@@ -14,7 +14,7 @@ const MediaCard = ({ name, location, image }) => {
       sx={{
         borderRadius: 2,
         boxShadow: "0px 8px 25px rgba(0, 0, 0, 0.25)",
-        "&:hover": { backgroundColor: colors.primary },
+        cursor: "pointer",
       }}
     >
       <CardMedia

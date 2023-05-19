@@ -29,3 +29,8 @@ export const getTimePassed = (time) => {
     } ago`;
   }
 };
+
+export const covertToKm = (meters) => {
+  if (!meters) return "";
+  return Math.round(meters / 1000);
+};
