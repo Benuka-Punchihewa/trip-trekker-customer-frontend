@@ -2,8 +2,11 @@ import { Box, Typography, Rating } from "@mui/material";
 import React from "react";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import { useSelector } from "react-redux";
 
 const Feedbacks = ({ rating, onUpdateClick, onDeleteClick }) => {
+  const authState = useSelector((state) => state.auth);
+
   return (
     <Box
       sx={{
@@ -17,17 +20,19 @@ const Feedbacks = ({ rating, onUpdateClick, onDeleteClick }) => {
       <Box>
         <Box sx={{ display: "flex", justifyContent: "space-between" }}>
           <Typography>{rating?.rater?.user?.name}</Typography>
-          <Box>
-            <EditIcon
-              sx={{ cursor: "pointer", mr: 1 }}
-              onClick={() => onUpdateClick(rating)}
-            />
-            <DeleteIcon
-              color="error"
-              sx={{ cursor: "pointer" }}
-              onClick={() => onDeleteClick(rating)}
-            />
-          </Box>
+          {authState?.user?._id === rating?.rater?.user?._id && (
+            <Box>
+              <EditIcon
+                sx={{ cursor: "pointer", mr: 1 }}
+                onClick={() => onUpdateClick(rating)}
+              />
+              <DeleteIcon
+                color="error"
+                sx={{ cursor: "pointer" }}
+                onClick={() => onDeleteClick(rating)}
+              />
+            </Box>
+          )}
         </Box>
 
         <Rating name="read-only" value={rating?.rating} readOnly />

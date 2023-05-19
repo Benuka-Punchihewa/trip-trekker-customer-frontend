@@ -32,11 +32,13 @@ import {
   getPaginatedAttractionRatings,
 } from "../service/rating.service";
 import { getNearestHotels } from "../service/hotel.service";
+import { useSelector } from "react-redux";
 
 const AttractionDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const scrollElmRef = useRef(null);
+  const authState = useSelector((state) => state.auth);
   const [attractionState, setAttractionState] = useState({
     isLoading: true,
     attraction: {},
@@ -522,13 +524,16 @@ const AttractionDetails = () => {
                 <Typography variant="h4" sx={{ fontWeight: "bold" }}>
                   Pulse Stream
                 </Typography>
-                <Button
-                  variant="contained"
-                  size="large"
-                  onClick={handleShowPulseStreamAddPopup}
-                >
-                  Add New
-                </Button>
+                {(authState?.user?.type === "Tour Guide" ||
+                  authState?.user?.type === "Tour Guide") && (
+                  <Button
+                    variant="contained"
+                    size="large"
+                    onClick={handleShowPulseStreamAddPopup}
+                  >
+                    Add New
+                  </Button>
+                )}
               </Box>
 
               {pulseStreamState.isLoading && (
@@ -671,13 +676,16 @@ const AttractionDetails = () => {
                 </Box>
               )}
               <Box>
-                <FeedbackForm
-                  attractionId={attractionState?.attraction._id}
-                  onSubmit={handleRatingSubmit}
-                  isUpdate={ratingFormState.isUpdateForm}
-                  rating={ratingFormState.activeRating}
-                  onUpdateCancel={handleRatingUpdateCancel}
-                />
+                {authState.isLoggedIn && (
+                  <FeedbackForm
+                    attractionId={attractionState?.attraction._id}
+                    onSubmit={handleRatingSubmit}
+                    isUpdate={ratingFormState.isUpdateForm}
+                    rating={ratingFormState.activeRating}
+                    onUpdateCancel={handleRatingUpdateCancel}
+                  />
+                )}
+
                 {ratingState?.content?.map((rating) => (
                   <Feedbacks
                     key={rating._id}
