@@ -1,7 +1,7 @@
-import { Box, Typography, Rating, TextField, Button } from "@mui/material";
+import { Box, Typography, Rating } from "@mui/material";
 import React from "react";
 
-const Feedbacks = () => {
+const Feedbacks = ({ rater, rating, review }) => {
   return (
     <Box
       sx={{
@@ -13,9 +13,9 @@ const Feedbacks = () => {
       }}
     >
       <Box>
-        <Typography>User Name</Typography>
-        <Rating name="read-only" value={5} readOnly />
-        <Typography>Review</Typography>
+        <Typography>{rater}</Typography>
+        <Rating name="read-only" value={rating} readOnly />
+        <Typography>{review}</Typography>
       </Box>
     </Box>
   );

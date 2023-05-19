@@ -36,6 +36,7 @@ import {
 import PulseStreamDataForm from "../components/attraction/PulseStreamDataForm";
 import Popup from "../components/common/Popup";
 import { popAlert, popDangerPrompt } from "../utils/alerts";
+import { getPaginatedAttractionRatings } from "../service/rating.service";
 
 const AttractionDetails = () => {
   const { id } = useParams();
@@ -55,16 +56,23 @@ const AttractionDetails = () => {
     activePulseRecord: null,
     showPopup: false,
   });
+  const [ratingState, setRatingState] = useState({
+    isLoading: false,
+    page: 1,
+    totalPages: 0,
+    content: [],
+    refresh: false,
+  });
 
-  const handlePageChange = (event, value) => {
+  const handlePulseStreamPageChange = (event, value) => {
     setPulseStreamState({ ...pulseStreamState, page: value });
   };
 
-  const handlePopupClose = () => {
+  const handlePulseStreamPopupClose = () => {
     setPulseStreamFormState({ ...pulseStreamFormState, showPopup: false });
   };
 
-  const handlePopupSuccess = () => {
+  const handlePulseStreamPopupSuccess = () => {
     setPulseStreamState({
       ...pulseStreamState,
       refresh: !pulseStreamState.refresh,
@@ -72,7 +80,7 @@ const AttractionDetails = () => {
     setPulseStreamFormState({ ...pulseStreamFormState, showPopup: false });
   };
 
-  const handleShowUpdatePopup = (record) => {
+  const handleShowPulseStreamUpdatePopup = (record) => {
     setPulseStreamFormState({
       ...pulseStreamFormState,
       showPopup: true,
@@ -81,7 +89,7 @@ const AttractionDetails = () => {
     });
   };
 
-  const handleShowAddPopup = () => {
+  const handleShowPulseStreamAddPopup = () => {
     setPulseStreamFormState({
       ...pulseStreamFormState,
       showPopup: true,
@@ -89,7 +97,7 @@ const AttractionDetails = () => {
     });
   };
 
-  const handleDelete = (record) => {
+  const handlePulseStreamDelete = (record) => {
     popDangerPrompt(
       "Warning",
       "Are you sure you want to delete this?",
@@ -111,96 +119,144 @@ const AttractionDetails = () => {
     });
   };
 
-  useEffect(() => {
-    let unmounted = false;
-    if (!id) return;
+  // attraction
+  useEffect(
+    () => {
+      let unmounted = false;
+      if (!id) return;
 
-    const fetchAndSet = async () => {
-      setAttractionState({ ...attractionState, isLoading: true });
-      const attractionResponse = await getAttractionById(id);
+      const fetchAndSet = async () => {
+        setAttractionState({ ...attractionState, isLoading: true });
+        const attractionResponse = await getAttractionById(id);
 
-      if (attractionResponse.success) {
-        const data = attractionResponse.data;
-        data.previewImages = [];
-        // resolove firesbase images
-        const images = data?.images || [];
+        if (attractionResponse.success) {
+          const data = attractionResponse.data;
+          data.previewImages = [];
+          // resolove firesbase images
+          const images = data?.images || [];
 
-        for (const image of images) {
-          const imageRef = image?.firebaseStorageRef;
-          if (imageRef) {
-            const url = await getDownloadURLFromFirebaseRef(imageRef);
-            data.previewImages.push(url);
+          for (const image of images) {
+            const imageRef = image?.firebaseStorageRef;
+            if (imageRef) {
+              const url = await getDownloadURLFromFirebaseRef(imageRef);
+              data.previewImages.push(url);
+            }
           }
+
+          if (!unmounted) {
+            setAttractionState({
+              ...attractionState,
+              isLoading: false,
+              attraction: data,
+            });
+          }
+        } else {
+          console.log(attractionResponse.data);
         }
+      };
 
-        if (!unmounted) {
-          setAttractionState({
-            ...attractionState,
-            isLoading: false,
-            attraction: data,
-          });
+      fetchAndSet();
+
+      return () => {
+        unmounted = true;
+      };
+    },
+    // eslint-disable-next-line
+    [id]
+  );
+
+  // ratings
+  useEffect(
+    () => {
+      let unmounted = false;
+      if (!attractionState?.attraction?._id) return;
+
+      const fetchAndSet = async () => {
+        setRatingState({
+          ...ratingState,
+          isLoading: true,
+        });
+        const response = await getPaginatedAttractionRatings(
+          attractionState.attraction._id,
+          ratingState.page,
+          6,
+          "desc"
+        );
+
+        if (response.success) {
+          if (!unmounted) {
+            setRatingState({
+              ...ratingState,
+              content: response.data?.content || [],
+              totalPages: response?.data?.totalPages || 0,
+              isLoading: false,
+            });
+          }
+        } else {
+          console.log(response.data);
         }
-      } else {
-        console.log(attractionResponse.data);
-      }
-    };
+      };
 
-    fetchAndSet();
+      fetchAndSet();
 
-    return () => {
-      unmounted = true;
-    };
-  }, [id]);
+      return () => {
+        unmounted = true;
+      };
+    },
+    // eslint-disable-next-line
+    [ratingState.refresh, attractionState.attraction, ratingState.page]
+  );
 
-  useEffect(() => {
-    let unmounted = false;
-    if (!attractionState?.attraction?._id) return;
+  // pulse stream
+  useEffect(
+    () => {
+      let unmounted = false;
+      if (!attractionState?.attraction?._id) return;
 
-    const fetchAndSet = async () => {
-      setPulseStreamState({
-        ...pulseStreamState,
-        isLoading: true,
-      });
-      const response = await getPaginatedPulseStreamData(
-        attractionState.attraction._id,
-        pulseStreamState.page,
-        6,
-        "desc"
-      );
+      const fetchAndSet = async () => {
+        setPulseStreamState({
+          ...pulseStreamState,
+          isLoading: true,
+        });
+        const response = await getPaginatedPulseStreamData(
+          attractionState.attraction._id,
+          pulseStreamState.page,
+          6,
+          "desc"
+        );
 
-      if (response.success) {
-        // resolove firesbase images
-        const pPulseStreamRecords = response?.data?.content || [];
+        if (response.success) {
+          // resolove firesbase images
+          const pPulseStreamRecords = response?.data?.content || [];
 
-        for (const record of pPulseStreamRecords) {
-          const imageRef = record?.image?.firebaseStorageRef;
-          if (imageRef)
-            record.preview = await getDownloadURLFromFirebaseRef(imageRef);
+          for (const record of pPulseStreamRecords) {
+            const imageRef = record?.image?.firebaseStorageRef;
+            if (imageRef)
+              record.preview = await getDownloadURLFromFirebaseRef(imageRef);
+          }
+
+          if (!unmounted) {
+            setPulseStreamState({
+              ...pulseStreamState,
+              content: pPulseStreamRecords,
+              totalPages: response?.data?.totalPages || 0,
+              isLoading: false,
+            });
+          }
+        } else {
+          console.log(response.data);
         }
+      };
 
-        if (!unmounted) {
-          setPulseStreamState({
-            ...pulseStreamState,
-            content: pPulseStreamRecords,
-            totalPages: response?.data?.totalPages || 0,
-            isLoading: false,
-          });
-        }
-      } else {
-        console.log(response.data);
-      }
-    };
+      fetchAndSet();
 
-    fetchAndSet();
-
-    return () => {
-      unmounted = true;
-    };
-  }, [
-    pulseStreamState.refresh,
-    attractionState.attraction,
-    pulseStreamState.page,
-  ]);
+      return () => {
+        unmounted = true;
+      };
+    },
+    // eslint-disable-next-line
+    [ratingState.refresh, attractionState.attraction, ratingState.page]
+  );
 
   if (attractionState.isLoading)
     return (
@@ -285,7 +341,7 @@ const AttractionDetails = () => {
                 <Button
                   variant="contained"
                   size="large"
-                  onClick={handleShowAddPopup}
+                  onClick={handleShowPulseStreamAddPopup}
                 >
                   Add New
                 </Button>
@@ -312,8 +368,8 @@ const AttractionDetails = () => {
                     key={record._id}
                     record={record}
                     image={record.preview}
-                    onUpdateClick={handleShowUpdatePopup}
-                    onDeleteClick={handleDelete}
+                    onUpdateClick={handleShowPulseStreamUpdatePopup}
+                    onDeleteClick={handlePulseStreamDelete}
                   />
                 ))}
 
@@ -321,7 +377,7 @@ const AttractionDetails = () => {
                   <Pagination
                     count={pulseStreamState.totalPages}
                     page={pulseStreamState.page}
-                    onChange={handlePageChange}
+                    onChange={handlePulseStreamPageChange}
                     fontWeight={"bold"}
                   />
                 </Box>
@@ -386,11 +442,30 @@ const AttractionDetails = () => {
               <Typography variant="h4" sx={{ fontWeight: "bold", mb: 2 }}>
                 Ratings & Reviews
               </Typography>
+              {ratingState.isLoading && (
+                <Box
+                  sx={{
+                    width: "100%",
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    my: 2,
+                  }}
+                >
+                  <CircularProgress />{" "}
+                  <span style={{ marginLeft: 10 }}>Loading...</span>
+                </Box>
+              )}
               <Box>
                 <FeedbackForm />
-                <Feedbacks />
-                <Feedbacks />
-                <Feedbacks />
+                {ratingState?.content?.map((rating) => (
+                  <Feedbacks
+                    key={rating._id}
+                    rater={rating.rater?.user?.name}
+                    rating={rating.rating}
+                    review={rating.review}
+                  />
+                ))}
               </Box>
             </Grid>
           </Grid>
@@ -401,11 +476,11 @@ const AttractionDetails = () => {
         title="Create Pulse Stream Record"
         width={800}
         show={pulseStreamFormState.showPopup}
-        onClose={handlePopupClose}
+        onClose={handlePulseStreamPopupClose}
       >
         <PulseStreamDataForm
           attractionId={attractionState?.attraction._id}
-          onSuccess={handlePopupSuccess}
+          onSuccess={handlePulseStreamPopupSuccess}
           isUpdate={pulseStreamFormState.isUpdateForm}
           pulseStreamRecord={pulseStreamFormState.activePulseRecord}
         />
