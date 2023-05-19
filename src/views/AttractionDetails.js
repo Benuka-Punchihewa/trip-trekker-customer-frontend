@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import {
   Typography,
   Box,
@@ -36,10 +36,14 @@ import {
 import PulseStreamDataForm from "../components/attraction/PulseStreamDataForm";
 import Popup from "../components/common/Popup";
 import { popAlert, popDangerPrompt } from "../utils/alerts";
-import { getPaginatedAttractionRatings } from "../service/rating.service";
+import {
+  deleteRating,
+  getPaginatedAttractionRatings,
+} from "../service/rating.service";
 
 const AttractionDetails = () => {
   const { id } = useParams();
+  const scrollElmRef = useRef(null);
   const [attractionState, setAttractionState] = useState({
     isLoading: true,
     attraction: {},
@@ -105,6 +109,43 @@ const AttractionDetails = () => {
     setRatingState({
       ...ratingState,
       refresh: !ratingState.refresh,
+    });
+  };
+
+  const handleRatingUpdateClick = (rating) => {
+    setRatingFormState({
+      ...ratingFormState,
+      isUpdateForm: true,
+      activeRating: rating,
+    });
+
+    // scroll to view
+    scrollElmRef.current.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+      inline: "nearest",
+    });
+  };
+
+  const handleRatingDeleteClick = (rating) => {
+    popDangerPrompt(
+      "Warning",
+      "Are you sure you want to delete this?",
+      "error"
+    ).then(async (res) => {
+      if (res.isConfirmed) {
+        const response = await deleteRating(rating._id);
+        if (response.success) {
+          popAlert("Success!", "Successfully deleted the rating!", "success");
+          setRatingState({
+            ...ratingState,
+            refresh: !ratingState.refresh,
+          });
+        } else {
+          response?.data &&
+            popAlert("Error!", response?.data?.message, "error");
+        }
+      }
     });
   };
 
@@ -450,6 +491,14 @@ const AttractionDetails = () => {
                   </Grid>
                 </Box>
               </Box>
+              <div
+                ref={scrollElmRef}
+                style={{
+                  position: "absolute",
+                  marginTop: "-100px",
+                  height: 100,
+                }}
+              />
               <Typography variant="h4" sx={{ fontWeight: "bold", mb: 2 }}>
                 Ratings & Reviews
               </Typography>
@@ -477,9 +526,9 @@ const AttractionDetails = () => {
                 {ratingState?.content?.map((rating) => (
                   <Feedbacks
                     key={rating._id}
-                    rater={rating.rater?.user?.name}
-                    rating={rating.rating}
-                    review={rating.review}
+                    rating={rating}
+                    onUpdateClick={handleRatingUpdateClick}
+                    onDeleteClick={handleRatingDeleteClick}
                   />
                 ))}
               </Box>

@@ -2,7 +2,10 @@ import { Box, Typography, Rating, TextField, Button } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import colors from "../../assets/Style/colors";
 import RatingModel from "../../models/rating";
-import { createAttractionRating } from "../../service/rating.service";
+import {
+  createAttractionRating,
+  updateRating,
+} from "../../service/rating.service";
 import { popAlert } from "../../utils/alerts";
 
 const FeedbackForm = ({ attractionId, isUpdate, rating, onSubmit }) => {
@@ -15,6 +18,9 @@ const FeedbackForm = ({ attractionId, isUpdate, rating, onSubmit }) => {
     let response;
     if (!isUpdate && attractionId) {
       response = await createAttractionRating(attractionId, inputs);
+    }
+    if (isUpdate && rating) {
+      response = await updateRating(rating._id, inputs);
     }
 
     if (response?.success) {
@@ -90,7 +96,7 @@ const FeedbackForm = ({ attractionId, isUpdate, rating, onSubmit }) => {
               type="submit"
               disabled={isLoading}
             >
-              Submit
+              {isUpdate ? "Update" : "Submit"}
             </Button>
           </Box>
         </Box>

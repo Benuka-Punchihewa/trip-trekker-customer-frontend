@@ -37,3 +37,29 @@ export const createAttractionRating = async (attractionId, data) => {
 
   return response;
 };
+
+export const updateRating = async (ratingId, data) => {
+  const response = await getApi()
+    .patch(`/ratings/${ratingId}`, data)
+    .then((res) => {
+      return buildResponse(true, res.data);
+    })
+    .catch((err) => {
+      return buildResponse(false, err.response.data, err.response.status);
+    });
+
+  return response;
+};
+
+export const deleteRating = async (ratingId) => {
+  const response = await getApi()
+    .delete(`/ratings/${ratingId}`)
+    .then((res) => {
+      return buildResponse(true, res.data);
+    })
+    .catch((err) => {
+      return buildResponse(false, err.response.data, err.response.status);
+    });
+
+  return response;
+};

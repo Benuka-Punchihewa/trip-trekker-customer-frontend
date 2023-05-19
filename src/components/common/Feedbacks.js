@@ -1,7 +1,9 @@
 import { Box, Typography, Rating } from "@mui/material";
 import React from "react";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
 
-const Feedbacks = ({ rater, rating, review }) => {
+const Feedbacks = ({ rating, onUpdateClick, onDeleteClick }) => {
   return (
     <Box
       sx={{
@@ -13,9 +15,23 @@ const Feedbacks = ({ rater, rating, review }) => {
       }}
     >
       <Box>
-        <Typography>{rater}</Typography>
-        <Rating name="read-only" value={rating} readOnly />
-        <Typography>{review}</Typography>
+        <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+          <Typography>{rating?.rater?.user?.name}</Typography>
+          <Box>
+            <EditIcon
+              sx={{ cursor: "pointer", mr: 1 }}
+              onClick={() => onUpdateClick(rating)}
+            />
+            <DeleteIcon
+              color="error"
+              sx={{ cursor: "pointer" }}
+              onClick={() => onDeleteClick(rating)}
+            />
+          </Box>
+        </Box>
+
+        <Rating name="read-only" value={rating?.rating} readOnly />
+        <Typography>{rating?.review}</Typography>
       </Box>
     </Box>
   );
