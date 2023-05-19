@@ -10,18 +10,6 @@ import {
 import { useNavigate, useParams } from "react-router-dom";
 import MapGoogle from "../components/common/MapGoogle";
 import MiniCard from "../components/common/MiniCard";
-import M1 from "../assets/Images/M1.png";
-import M2 from "../assets/Images/M2.png";
-import M3 from "../assets/Images/M3.png";
-import M4 from "../assets/Images/M4.png";
-import M5 from "../assets/Images/M5.png";
-import M6 from "../assets/Images/M6.png";
-import H1 from "../assets/Images/H1.png";
-import H2 from "../assets/Images/H2.png";
-import H3 from "../assets/Images/H3.png";
-import H4 from "../assets/Images/H4.png";
-import H5 from "../assets/Images/H5.png";
-import H6 from "../assets/Images/H6.png";
 import FeedbackForm from "../components/common/FeedbackForm";
 import Feedbacks from "../components/common/Feedbacks";
 import PulseStreamDataRecord from "../components/common/PulseStreamDataRecord";
@@ -43,6 +31,7 @@ import {
   deleteRating,
   getPaginatedAttractionRatings,
 } from "../service/rating.service";
+import { getNearestHotels } from "../service/hotel.service";
 
 const AttractionDetails = () => {
   const { id } = useParams();
@@ -76,6 +65,10 @@ const AttractionDetails = () => {
     activeRating: null,
   });
   const [nearestAttractionsState, setNearestAttractionsState] = useState({
+    isLoading: false,
+    content: [],
+  });
+  const [nearestHotelsState, setNearestHotelsState] = useState({
     isLoading: false,
     content: [],
   });
@@ -392,6 +385,63 @@ const AttractionDetails = () => {
     [attractionState.attraction]
   );
 
+  // nearest hotels
+  useEffect(
+    () => {
+      let unmounted = false;
+      const coordinates = attractionState?.attraction?.location?.coordinates;
+      if (!coordinates || coordinates.length <= 0) return;
+
+      const fetchAndSet = async () => {
+        setNearestHotelsState({
+          ...nearestHotelsState,
+          isLoading: true,
+        });
+        const response = await getNearestHotels(
+          attractionState.attraction.location.coordinates[1],
+          attractionState.attraction.location.coordinates[0],
+          7
+        );
+
+        if (response.success) {
+          const content = response.data || [];
+
+          // remove this attraction
+          const thisIndex = content.findIndex(
+            (item) => item._id === attractionState.attraction?._id
+          );
+          if (thisIndex !== -1) content.splice(thisIndex, 1);
+
+          for (const item of content) {
+            if (!item?.images || item.images.length <= 0) continue;
+
+            const imageRef = item?.images[0]?.firebaseStorageRef;
+            if (imageRef)
+              item.preview = await getDownloadURLFromFirebaseRef(imageRef);
+          }
+
+          if (!unmounted) {
+            setNearestHotelsState({
+              ...nearestHotelsState,
+              content,
+              isLoading: false,
+            });
+          }
+        } else {
+          console.log(response.data);
+        }
+      };
+
+      fetchAndSet();
+
+      return () => {
+        unmounted = true;
+      };
+    },
+    // eslint-disable-next-line
+    [attractionState.attraction]
+  );
+
   if (attractionState.isLoading)
     return (
       <Box
@@ -561,27 +611,37 @@ const AttractionDetails = () => {
               <Typography variant="h4" sx={{ fontWeight: "bold", mb: 2 }}>
                 Nearby Hotels
               </Typography>
+              {nearestHotelsState.isLoading && (
+                <Box
+                  sx={{
+                    width: "100%",
+                    display: "flex",
+                    justifyContent: "left",
+                    alignItems: "center",
+                    my: 2,
+                  }}
+                >
+                  <CircularProgress />{" "}
+                  <span style={{ marginLeft: 10 }}>Loading...</span>
+                </Box>
+              )}
               <Box sx={{ mb: 5 }}>
                 <Box sx={{ flexGrow: 1 }}>
                   <Grid container spacing={2}>
-                    <Grid item xs={4}>
-                      <MiniCard image={H1} name={"Name"} />
-                    </Grid>
-                    <Grid item xs={4}>
-                      <MiniCard image={H2} name={"Name"} />
-                    </Grid>
-                    <Grid item xs={4}>
-                      <MiniCard image={H3} name={"Name"} />
-                    </Grid>
-                    <Grid item xs={4}>
-                      <MiniCard image={H4} name={"Name"} />
-                    </Grid>
-                    <Grid item xs={4}>
-                      <MiniCard image={H5} name={"Name"} />
-                    </Grid>
-                    <Grid item xs={4}>
-                      <MiniCard image={H6} name={"Name"} />
-                    </Grid>
+                    {nearestHotelsState.content?.map((hotel) => (
+                      <Grid
+                        item
+                        xs={4}
+                        key={hotel._id}
+                        onClick={() => navigate(`/hotels/${hotel._id}`)}
+                      >
+                        <MiniCard
+                          image={hotel.preview}
+                          name={hotel.name}
+                          distance={covertToKm(hotel.distance)}
+                        />
+                      </Grid>
+                    ))}
                   </Grid>
                 </Box>
               </Box>

@@ -1,13 +1,11 @@
 import React from "react";
 import Card from "@mui/material/Card";
-import CardActions from "@mui/material/CardActions";
 import CardMedia from "@mui/material/CardMedia";
 import Typography from "@mui/material/Typography";
-import { Box, CardContent } from "@mui/material";
-import Rectangle3 from "../../assets/Images/Rectangle3.png";
+import { CardContent } from "@mui/material";
 import colors from "../../assets/Style/colors";
 
-const MiniCard = ({ name, distance = 20, image }) => {
+const MiniCard = ({ name, distance, image }) => {
   return (
     <Card
       sx={{
