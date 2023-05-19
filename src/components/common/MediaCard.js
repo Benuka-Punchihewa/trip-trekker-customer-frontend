@@ -4,8 +4,6 @@ import CardActions from "@mui/material/CardActions";
 import CardMedia from "@mui/material/CardMedia";
 import Typography from "@mui/material/Typography";
 import { Box } from "@mui/material";
-import Rectangle3 from "../../assets/Images/Rectangle3.png";
-import colors from "../../assets/Style/colors";
 import NotFoundImage from "../../assets/Images/image-not-found.webp";
 
 const MediaCard = ({ name, location, image }) => {
@@ -14,7 +12,7 @@ const MediaCard = ({ name, location, image }) => {
       sx={{
         borderRadius: 2,
         boxShadow: "0px 8px 25px rgba(0, 0, 0, 0.25)",
-        "&:hover": { backgroundColor: colors.primary },
+        cursor: "pointer",
       }}
     >
       <CardMedia

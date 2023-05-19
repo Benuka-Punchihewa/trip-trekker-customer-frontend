@@ -23,7 +23,8 @@ import { styled } from "@mui/material/styles";
 import { useNavigate } from "react-router-dom";
 import Banner from "../../assets/Images/Rectangle1.png";
 import PopupState, { bindTrigger, bindMenu } from "material-ui-popup-state";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { authActions } from "../../store/authSlice";
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === "dark" ? "#1A2027" : "#fff",
@@ -34,8 +35,8 @@ const Item = styled(Paper)(({ theme }) => ({
 }));
 
 const NavBar = () => {
+  const dispatch = useDispatch();
   const authState = useSelector((state) => state.auth);
-  console.log("auth state : ", authState);
   const [showPopup, setShowPopup] = useState(false);
   const [showRegiserPopup, setshowRegiserPopup] = useState(false);
   const [errors, setErrors] = useState({});
@@ -89,6 +90,10 @@ const NavBar = () => {
 
   const NavigateProfile = () => {
     navigate("profile");
+  };
+
+  const handleLogout = () => {
+    dispatch(authActions.logout());
   };
 
   return (
@@ -179,7 +184,7 @@ const NavBar = () => {
                         <MenuItem onClick={NavigateProfile}>Profile</MenuItem>
                       )}
 
-                      <MenuItem onClick={popupState.close}>Logout</MenuItem>
+                      <MenuItem onClick={handleLogout}>Logout</MenuItem>
                     </Menu>
                   </React.Fragment>
                 )}

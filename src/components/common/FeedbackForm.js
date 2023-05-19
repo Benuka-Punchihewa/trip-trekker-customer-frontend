@@ -1,9 +1,72 @@
 import { Box, Typography, Rating, TextField, Button } from "@mui/material";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import colors from "../../assets/Style/colors";
+import RatingModel from "../../models/rating";
+import {
+  createAttractionRating,
+  updateRating,
+} from "../../service/rating.service";
+import { popAlert } from "../../utils/alerts";
 
-const FeedbackForm = () => {
-  const [value, setValue] = useState();
+const FeedbackForm = ({
+  attractionId,
+  isUpdate,
+  rating,
+  onSubmit,
+  onUpdateCancel,
+}) => {
+  const [inputs, setInputs] = useState(RatingModel);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+    let response;
+    if (!isUpdate && attractionId) {
+      response = await createAttractionRating(attractionId, inputs);
+    }
+    if (isUpdate && rating) {
+      response = await updateRating(rating._id, inputs);
+    }
+
+    if (response?.success) {
+      response?.data &&
+        popAlert("Success!", response?.data?.message, "success").then((res) => {
+          setInputs(RatingModel);
+          onSubmit();
+        });
+    } else {
+      response?.data?.message &&
+        popAlert("Error!", response?.data?.message, "error");
+    }
+
+    setIsLoading(false);
+  };
+
+  const handleClearOrCanel = () => {
+    if (isUpdate) {
+      onUpdateCancel();
+    }
+    setInputs(RatingModel);
+  };
+
+  useEffect(() => {
+    let unmounted = false;
+    if (!rating) return;
+
+    if (!unmounted && isUpdate) {
+      setInputs({
+        ...RatingModel,
+        rating: rating.rating,
+        review: rating.review,
+      });
+    }
+
+    return () => {
+      unmounted = true;
+    };
+  }, [rating, isUpdate]);
+
   return (
     <Box
       sx={{
@@ -13,14 +76,14 @@ const FeedbackForm = () => {
         borderRadius: 2,
       }}
     >
-      <form>
+      <form onSubmit={handleSubmit}>
         <Box>
           <Typography>Rating</Typography>
           <Rating
             name="simple-controlled"
-            value={value}
-            onChange={(event, newValue) => {
-              setValue(newValue);
+            value={inputs.rating}
+            onChange={(event, value) => {
+              setInputs({ ...inputs, rating: value });
             }}
           />
         </Box>
@@ -31,6 +94,10 @@ const FeedbackForm = () => {
             multiline
             maxRows={4}
             fullWidth
+            value={inputs.review}
+            onChange={(e) => {
+              setInputs({ ...inputs, review: e.target.value });
+            }}
             sx={{ color: colors.grey }}
           />
           <Box sx={{ mt: 1, display: "flex", justifyContent: "flex-end" }}>
@@ -38,9 +105,25 @@ const FeedbackForm = () => {
               size="small"
               color="primary"
               variant="outlined"
-              sx={{ backgroundColor: colors.secondary }}
+              sx={{
+                backgroundColor: colors.secondary,
+                color: colors.white,
+                mr: 1,
+              }}
+              type="submit"
+              disabled={isLoading}
             >
-              Submit
+              {isUpdate ? "Update" : "Submit"}
+            </Button>
+            <Button
+              size="small"
+              color="primary"
+              variant="outlined"
+              sx={{ backgroundColor: colors.grey, color: colors.white }}
+              disabled={isLoading}
+              onClick={handleClearOrCanel}
+            >
+              {isUpdate ? "Cancel" : "Clear"}
             </Button>
           </Box>
         </Box>

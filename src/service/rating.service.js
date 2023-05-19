@@ -1,19 +1,18 @@
 import { getApi } from "../utils/axios";
 import { buildResponse } from "../utils/responseBuilder";
 
-export const getPaginatedAttractions = async (
+export const getPaginatedAttractionRatings = async (
+  attractionId,
   page,
   limit,
-  orderBy,
-  keyword
+  orderBy
 ) => {
   const response = await getApi()
-    .get("/attractions", {
+    .get(`/ratings/attractions/${attractionId}`, {
       params: {
         page,
         limit,
         orderBy,
-        keyword,
       },
     })
     .then((res) => {
@@ -26,9 +25,9 @@ export const getPaginatedAttractions = async (
   return response;
 };
 
-export const getAttractionById = async (id) => {
+export const createAttractionRating = async (attractionId, data) => {
   const response = await getApi()
-    .get(`/attractions/${id}`)
+    .post(`/ratings/attractions/${attractionId}`, data)
     .then((res) => {
       return buildResponse(true, res.data);
     })
@@ -39,15 +38,22 @@ export const getAttractionById = async (id) => {
   return response;
 };
 
-export const getNearestAttractions = async (lat, lng, limit) => {
+export const updateRating = async (ratingId, data) => {
   const response = await getApi()
-    .get("/attractions/nearest/locations", {
-      params: {
-        limit,
-        lat,
-        lng,
-      },
+    .patch(`/ratings/${ratingId}`, data)
+    .then((res) => {
+      return buildResponse(true, res.data);
     })
+    .catch((err) => {
+      return buildResponse(false, err.response.data, err.response.status);
+    });
+
+  return response;
+};
+
+export const deleteRating = async (ratingId) => {
+  const response = await getApi()
+    .delete(`/ratings/${ratingId}`)
     .then((res) => {
       return buildResponse(true, res.data);
     })

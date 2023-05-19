@@ -95,17 +95,19 @@ const TourGuides = () => {
               justifyContent: "center",
             }}
           >
-            <Grid container spacing={4} style={{ maxWidth: 1300 }}>
-              {tourGuides?.map((item) => (
-                <Grid
-                  item
-                  xs={3}
-                  key={item._id}
-                  onClick={() => handleItemClick(item._id)}
-                >
-                  <MediaCard image={per1} name={item.name} />
-                </Grid>
-              ))}
+            <Grid container spacing={4}>
+              {tourGuides &&
+                tourGuides.map((item) => (
+                  <Grid
+                    item
+                    md={4}
+                    lg={3}
+                    key={item._id}
+                    onClick={() => handleItemClick(item._id)}
+                  >
+                    <MediaCard image={per1} name={item.name} />
+                  </Grid>
+                ))}
             </Grid>
           </Box>
         </Box>
