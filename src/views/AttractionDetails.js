@@ -39,39 +39,54 @@ import { popAlert, popDangerPrompt } from "../utils/alerts";
 
 const AttractionDetails = () => {
   const { id } = useParams();
-  const [isAttractionLoading, setIsAttractionLoading] = useState(true);
-  const [isPulseStreamLoading, setIsPulseStreamLoading] = useState(true);
-  const [attraction, setAttraction] = useState({});
-  const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(0);
-  const [pulseStreamRecords, setPulseSteamRecords] = useState([]);
-  const [showPopup, setShowPopup] = useState(false);
-  const [refresh, setRefresh] = useState(false);
-  const [isUpdateForm, setIsUpdateForm] = useState(false);
-  const [activePulseRecord, setActivePulseRecord] = useState(null);
+  const [attractionState, setAttractionState] = useState({
+    isLoading: true,
+    attraction: {},
+  });
+  const [pulseStreamState, setPulseStreamState] = useState({
+    isLoading: false,
+    page: 1,
+    totalPages: 0,
+    content: [],
+    refresh: false,
+  });
+  const [pulseStreamFormState, setPulseStreamFormState] = useState({
+    isUpdateForm: false,
+    activePulseRecord: null,
+    showPopup: false,
+  });
 
   const handlePageChange = (event, value) => {
-    setPage(value);
+    setPulseStreamState({ ...pulseStreamState, page: value });
   };
 
   const handlePopupClose = () => {
-    setShowPopup(false);
+    setPulseStreamFormState({ ...pulseStreamFormState, showPopup: false });
   };
 
   const handlePopupSuccess = () => {
-    setRefresh(!refresh);
-    setShowPopup(false);
+    setPulseStreamState({
+      ...pulseStreamState,
+      refresh: !pulseStreamState.refresh,
+    });
+    setPulseStreamFormState({ ...pulseStreamFormState, showPopup: false });
   };
 
   const handleShowUpdatePopup = (record) => {
-    setShowPopup(true);
-    setIsUpdateForm(true);
-    setActivePulseRecord(record);
+    setPulseStreamFormState({
+      ...pulseStreamFormState,
+      showPopup: true,
+      isUpdateForm: true,
+      activePulseRecord: record,
+    });
   };
 
   const handleShowAddPopup = () => {
-    setShowPopup(true);
-    setIsUpdateForm(false);
+    setPulseStreamFormState({
+      ...pulseStreamFormState,
+      showPopup: true,
+      isUpdateForm: false,
+    });
   };
 
   const handleDelete = (record) => {
@@ -84,7 +99,10 @@ const AttractionDetails = () => {
         const response = await deletePulseStreamRecord(record._id);
         if (response.success) {
           popAlert("Success!", "Successfully deleted the record!", "success");
-          setRefresh(!refresh);
+          setPulseStreamState({
+            ...pulseStreamState,
+            refresh: !pulseStreamState.refresh,
+          });
         } else {
           response?.data &&
             popAlert("Error!", response?.data?.message, "error");
@@ -98,7 +116,7 @@ const AttractionDetails = () => {
     if (!id) return;
 
     const fetchAndSet = async () => {
-      setIsAttractionLoading(true);
+      setAttractionState({ ...attractionState, isLoading: true });
       const attractionResponse = await getAttractionById(id);
 
       if (attractionResponse.success) {
@@ -116,8 +134,11 @@ const AttractionDetails = () => {
         }
 
         if (!unmounted) {
-          setAttraction(data);
-          setIsAttractionLoading(false);
+          setAttractionState({
+            ...attractionState,
+            isLoading: false,
+            attraction: data,
+          });
         }
       } else {
         console.log(attractionResponse.data);
@@ -133,13 +154,16 @@ const AttractionDetails = () => {
 
   useEffect(() => {
     let unmounted = false;
-    if (!attraction._id) return;
+    if (!attractionState?.attraction?._id) return;
 
     const fetchAndSet = async () => {
-      setIsPulseStreamLoading(true);
+      setPulseStreamState({
+        ...pulseStreamState,
+        isLoading: true,
+      });
       const response = await getPaginatedPulseStreamData(
-        attraction._id,
-        page,
+        attractionState.attraction._id,
+        pulseStreamState.page,
         6,
         "desc"
       );
@@ -155,9 +179,12 @@ const AttractionDetails = () => {
         }
 
         if (!unmounted) {
-          setPulseSteamRecords(pPulseStreamRecords);
-          setTotalPages(response?.data?.totalPages || 0);
-          setIsPulseStreamLoading(false);
+          setPulseStreamState({
+            ...pulseStreamState,
+            content: pPulseStreamRecords,
+            totalPages: response?.data?.totalPages || 0,
+            isLoading: false,
+          });
         }
       } else {
         console.log(response.data);
@@ -169,9 +196,13 @@ const AttractionDetails = () => {
     return () => {
       unmounted = true;
     };
-  }, [refresh, attraction, page]);
+  }, [
+    pulseStreamState.refresh,
+    attractionState.attraction,
+    pulseStreamState.page,
+  ]);
 
-  if (isAttractionLoading && isPulseStreamLoading)
+  if (attractionState.isLoading)
     return (
       <Box
         sx={{
@@ -188,27 +219,33 @@ const AttractionDetails = () => {
   return (
     <>
       <Box sx={{ width: "100%" }}>
-        <Slider images={attraction?.previewImages} />
+        <Slider images={attractionState?.attraction?.previewImages} />
 
         <Box sx={{ flexGrow: 1 }}>
           <Grid container spacing={2}>
             <Grid item xs={6} sx={{ mt: 3, ml: 8 }}>
               <Typography variant="h3" sx={{ fontWeight: "bold", mb: 2 }}>
-                {attraction?.name}
+                {attractionState?.attraction?.name}
               </Typography>
-              <Typography>{attraction?.description}</Typography>
+              <Typography>
+                {attractionState?.attraction?.description}
+              </Typography>
 
               <Typography variant="h5" sx={{ fontWeight: "bold", mt: 2 }}>
                 Hours of Operation
               </Typography>
               <Typography>
-                {new Date(attraction.openHours?.open).toLocaleString("en-US", {
+                {new Date(
+                  attractionState?.attraction.openHours?.open
+                ).toLocaleString("en-US", {
                   hour: "numeric",
                   minute: "numeric",
                   hour12: true,
                 })}{" "}
                 to{" "}
-                {new Date(attraction.openHours?.close).toLocaleString("en-US", {
+                {new Date(
+                  attractionState?.attraction.openHours?.close
+                ).toLocaleString("en-US", {
                   hour: "numeric",
                   minute: "numeric",
                   hour12: true,
@@ -219,7 +256,9 @@ const AttractionDetails = () => {
                 Accessibility Options
               </Typography>
               <Typography>
-                {getStrigifiedStringArrayItems(attraction.accessibilityOptions)}
+                {getStrigifiedStringArrayItems(
+                  attractionState?.attraction.accessibilityOptions
+                )}
               </Typography>
 
               <Typography variant="h4" sx={{ fontWeight: "bold", mt: 2 }}>
@@ -227,8 +266,8 @@ const AttractionDetails = () => {
               </Typography>
               <Box>
                 <MapGoogle
-                  lat={attraction?.location?.coordinates[1]}
-                  lng={attraction?.location?.coordinates[0]}
+                  lat={attractionState?.attraction?.location?.coordinates[1]}
+                  lng={attractionState?.attraction?.location?.coordinates[0]}
                 />
               </Box>
 
@@ -252,8 +291,23 @@ const AttractionDetails = () => {
                 </Button>
               </Box>
 
+              {pulseStreamState.isLoading && (
+                <Box
+                  sx={{
+                    width: "100%",
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    my: 2,
+                  }}
+                >
+                  <CircularProgress />{" "}
+                  <span style={{ marginLeft: 10 }}>Loading...</span>
+                </Box>
+              )}
+
               <Box sx={{ mb: 5 }}>
-                {pulseStreamRecords?.map((record) => (
+                {pulseStreamState?.content?.map((record) => (
                   <PulseStreamDataRecord
                     key={record._id}
                     record={record}
@@ -265,8 +319,8 @@ const AttractionDetails = () => {
 
                 <Box sx={{ mt: 2 }}>
                   <Pagination
-                    count={totalPages}
-                    page={page}
+                    count={pulseStreamState.totalPages}
+                    page={pulseStreamState.page}
                     onChange={handlePageChange}
                     fontWeight={"bold"}
                   />
@@ -346,14 +400,14 @@ const AttractionDetails = () => {
       <Popup
         title="Create Pulse Stream Record"
         width={800}
-        show={showPopup}
+        show={pulseStreamFormState.showPopup}
         onClose={handlePopupClose}
       >
         <PulseStreamDataForm
-          attractionId={attraction._id}
+          attractionId={attractionState?.attraction._id}
           onSuccess={handlePopupSuccess}
-          isUpdate={isUpdateForm}
-          pulseStreamRecord={activePulseRecord}
+          isUpdate={pulseStreamFormState.isUpdateForm}
+          pulseStreamRecord={pulseStreamFormState.activePulseRecord}
         />
       </Popup>
     </>

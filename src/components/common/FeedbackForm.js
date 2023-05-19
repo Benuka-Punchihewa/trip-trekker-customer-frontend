@@ -2,7 +2,7 @@ import { Box, Typography, Rating, TextField, Button } from "@mui/material";
 import React, { useState } from "react";
 import colors from "../../assets/Style/colors";
 
-const FeedbackForm = () => {
+const FeedbackForm = ({attractionId, onSubmit}) => {
   const [value, setValue] = useState();
   return (
     <Box
