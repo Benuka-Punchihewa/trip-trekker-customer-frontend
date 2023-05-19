@@ -63,6 +63,10 @@ const AttractionDetails = () => {
     content: [],
     refresh: false,
   });
+  const [ratingFormState, setRatingFormState] = useState({
+    isUpdateForm: false,
+    activeRating: null,
+  });
 
   const handlePulseStreamPageChange = (event, value) => {
     setPulseStreamState({ ...pulseStreamState, page: value });
@@ -94,6 +98,13 @@ const AttractionDetails = () => {
       ...pulseStreamFormState,
       showPopup: true,
       isUpdateForm: false,
+    });
+  };
+
+  const handleRatingSubmit = () => {
+    setRatingState({
+      ...ratingState,
+      refresh: !ratingState.refresh,
     });
   };
 
@@ -457,7 +468,12 @@ const AttractionDetails = () => {
                 </Box>
               )}
               <Box>
-                <FeedbackForm />
+                <FeedbackForm
+                  attractionId={attractionState?.attraction._id}
+                  onSubmit={handleRatingSubmit}
+                  isUpdate={ratingFormState.isUpdateForm}
+                  rating={ratingFormState.activeRating}
+                />
                 {ratingState?.content?.map((rating) => (
                   <Feedbacks
                     key={rating._id}
