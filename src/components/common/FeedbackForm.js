@@ -105,7 +105,11 @@ const FeedbackForm = ({
               size="small"
               color="primary"
               variant="outlined"
-              sx={{ backgroundColor: colors.secondary, mr: 1 }}
+              sx={{
+                backgroundColor: colors.secondary,
+                color: colors.white,
+                mr: 1,
+              }}
               type="submit"
               disabled={isLoading}
             >

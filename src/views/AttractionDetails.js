@@ -320,7 +320,11 @@ const AttractionDetails = () => {
       };
     },
     // eslint-disable-next-line
-    [ratingState.refresh, attractionState.attraction, ratingState.page]
+    [
+      pulseStreamState.refresh,
+      attractionState.attraction,
+      pulseStreamState.page,
+    ]
   );
 
   if (attractionState.isLoading)

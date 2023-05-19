@@ -10,6 +10,7 @@ import {
 import Grid from "@mui/material/Grid";
 import { getTimePassed } from "../../utils/common";
 import { useSelector } from "react-redux";
+import colors from "../../assets/Style/colors";
 
 const PulseStreamDataRecord = ({
   record,
@@ -18,6 +19,12 @@ const PulseStreamDataRecord = ({
   onDeleteClick,
 }) => {
   const authState = useSelector((state) => state.auth);
+
+  const getBackgroudColorByTag = (tag) => {
+    if (tag === "Hazard") return "#CC3300";
+    else if (tag === "Warning") return "#ffcc00";
+    else if (tag === "Info") return "#33FFE9";
+  };
 
   return (
     <Box sx={{ mb: 1 }}>
@@ -30,8 +37,8 @@ const PulseStreamDataRecord = ({
           image={image}
         />
         <CardContent>
-          <Box sx={{ flexGrow: 1 }}>
-            <Grid container spacing={2}>
+          <Box>
+            <Grid container>
               <Grid item xs={8}>
                 <Typography gutterBottom variant="h6" component="div">
                   {record?.user?.name}
@@ -40,7 +47,7 @@ const PulseStreamDataRecord = ({
               <Grid item xs={4}>
                 <Typography
                   gutterBottom
-                  variant="body1"
+                  variant="body"
                   component="div"
                   textAlign={"right"}
                 >
@@ -49,8 +56,20 @@ const PulseStreamDataRecord = ({
               </Grid>
             </Grid>
           </Box>
+          <Box sx={{ width: "fit-content", mb: 2 }}>
+            <Typography
+              sx={{
+                backgroundColor: getBackgroudColorByTag(record.tag),
+                px: 2,
+                borderRadius: 4,
+                color: colors.white,
+              }}
+            >
+              {record.tag}
+            </Typography>
+          </Box>
 
-          <Typography variant="body2" color="text.secondary">
+          <Typography variant="span" color="text.secondary">
             {record.description}
           </Typography>
         </CardContent>
