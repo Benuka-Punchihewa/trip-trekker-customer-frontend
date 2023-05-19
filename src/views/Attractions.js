@@ -118,12 +118,13 @@ const Attractions = () => {
             justifyContent: "center",
           }}
         >
-          <Grid container spacing={2} style={{ maxWidth: 1300 }}>
+          <Grid container spacing={2} style={{}}>
             {attractions?.map((attraction) => (
               <Grid
                 item
                 key={attraction._id}
-                xs={4}
+                md={4}
+                lg={3}
                 onClick={() => handleClick(attraction._id)}
               >
                 <MediaCard image={attraction.preview} name={attraction.name} />

@@ -59,14 +59,14 @@ const Hotels = () => {
             justifyContent: "center",
           }}
         >
-          <Grid container spacing={2} style={{ maxWidth: 1300 }}>
-            <Grid item xs={4} onClick={hotelbyId}>
+          <Grid container spacing={2}>
+            <Grid item md={4} lg={3} onClick={hotelbyId}>
               <MediaCard image={hotel1} name={"Name"} location={"Location"} />
             </Grid>
-            <Grid item xs={4} onClick={hotelbyId}>
+            <Grid item md={4} lg={3} onClick={hotelbyId}>
               <MediaCard image={hotel1} name={"Name"} location={"Location"} />
             </Grid>
-            <Grid item xs={4} onClick={hotelbyId}>
+            <Grid item md={4} lg={3} onClick={hotelbyId}>
               <MediaCard image={hotel1} name={"Name"} location={"Location"} />
             </Grid>
           </Grid>
