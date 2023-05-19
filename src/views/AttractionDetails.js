@@ -110,6 +110,11 @@ const AttractionDetails = () => {
       ...ratingState,
       refresh: !ratingState.refresh,
     });
+    setRatingFormState({
+      ...ratingFormState,
+      isUpdateForm: false,
+      activeRating: {},
+    });
   };
 
   const handleRatingUpdateClick = (rating) => {
@@ -146,6 +151,14 @@ const AttractionDetails = () => {
             popAlert("Error!", response?.data?.message, "error");
         }
       }
+    });
+  };
+
+  const handleRatingUpdateCancel = () => {
+    setRatingFormState({
+      ...ratingFormState,
+      isUpdateForm: false,
+      activeRating: {},
     });
   };
 
@@ -522,6 +535,7 @@ const AttractionDetails = () => {
                   onSubmit={handleRatingSubmit}
                   isUpdate={ratingFormState.isUpdateForm}
                   rating={ratingFormState.activeRating}
+                  onUpdateCancel={handleRatingUpdateCancel}
                 />
                 {ratingState?.content?.map((rating) => (
                   <Feedbacks

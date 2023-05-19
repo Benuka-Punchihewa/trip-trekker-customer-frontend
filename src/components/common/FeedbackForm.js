@@ -8,7 +8,13 @@ import {
 } from "../../service/rating.service";
 import { popAlert } from "../../utils/alerts";
 
-const FeedbackForm = ({ attractionId, isUpdate, rating, onSubmit }) => {
+const FeedbackForm = ({
+  attractionId,
+  isUpdate,
+  rating,
+  onSubmit,
+  onUpdateCancel,
+}) => {
   const [inputs, setInputs] = useState(RatingModel);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -35,6 +41,13 @@ const FeedbackForm = ({ attractionId, isUpdate, rating, onSubmit }) => {
     }
 
     setIsLoading(false);
+  };
+
+  const handleClearOrCanel = () => {
+    if (isUpdate) {
+      onUpdateCancel();
+    }
+    setInputs(RatingModel);
   };
 
   useEffect(() => {
@@ -92,11 +105,21 @@ const FeedbackForm = ({ attractionId, isUpdate, rating, onSubmit }) => {
               size="small"
               color="primary"
               variant="outlined"
-              sx={{ backgroundColor: colors.secondary }}
+              sx={{ backgroundColor: colors.secondary, mr: 1 }}
               type="submit"
               disabled={isLoading}
             >
               {isUpdate ? "Update" : "Submit"}
+            </Button>
+            <Button
+              size="small"
+              color="primary"
+              variant="outlined"
+              sx={{ backgroundColor: colors.grey, color: colors.white }}
+              disabled={isLoading}
+              onClick={handleClearOrCanel}
+            >
+              {isUpdate ? "Cancel" : "Clear"}
             </Button>
           </Box>
         </Box>
