@@ -19,15 +19,13 @@ import {
   createPortfolio,
   deletePortfolio,
   updatePortfolio,
-  getPortfolioById,
 } from "../service/portfolio.service";
 import portfolio from "../models/portfolio";
 import { popAlert, popDangerPrompt } from "../utils/alerts";
+import { getDownloadURLFromFirebaseRef } from "../utils/firebase";
 
 //image
 import personImage from "../assets/Images/per3.png";
-import portImg1 from "../assets/Images/po1.jpg";
-import portImg2 from "../assets/Images/po2.jpg";
 
 const Profile = () => {
   const authState = useSelector((state) => state.auth);
@@ -45,7 +43,6 @@ const Profile = () => {
     limit: 10,
     orderBy: "desc",
   });
-  // const [selectedPortfolio, setSelectedPortfolio] = useState("");
 
   //create portfolio
   const handleSubmit = async (e) => {
@@ -53,8 +50,6 @@ const Profile = () => {
     setLoading(true);
 
     const response = await createPortfolio(inputs);
-
-    console.log(inputs);
 
     if (response.success) {
       response?.data &&
@@ -111,29 +106,15 @@ const Profile = () => {
   //update portfolio fetch data
   const handlePortfolioUpdate = async (item) => {
     setUpdateShowPopup(true);
-    //   // setSelectedPortfolio(response.data);
+
     setInputs(item);
-    // console.log("portID", id);
-    // const response = await getPortfolioById(id);
-    // if (response.success) {
-    //   console.log("response", response?.data);
-    //   setUpdateShowPopup(true);
-    //   // setSelectedPortfolio(response.data);
-    //   setInputs(response.data);
-    // } else {
-    //   console.error(response.data);
-    // }
   };
 
-  // console.log("selectedPortfolio", selectedPortfolio);
   const handleUpdateSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
 
-    // console.log("selectedPortfolio.id ", selectedPortfolio._id);
     const response = await updatePortfolio(inputs, inputs._id);
-
-    // console.log(selectedPortfolio);
 
     if (response.success) {
       response?.data &&
@@ -158,7 +139,6 @@ const Profile = () => {
   //get birthday date
   const birthday = new Date(authState.user.birthday);
   const birthdate = birthday.toLocaleDateString();
-  console.log("bdate", birthdate);
 
   //get all portfolios
   useEffect(() => {
@@ -176,8 +156,16 @@ const Profile = () => {
 
       if (response.success) {
         if (!response.data) return;
-        console.log(response.data);
-        setPortfolios(response.data.content);
+
+        const iPortfolio = response?.data?.content || [];
+
+        for (const portfolio of iPortfolio) {
+          const imageRef = portfolio?.image?.firebaseStorageRef;
+          if (imageRef)
+            portfolio.image = await getDownloadURLFromFirebaseRef(imageRef);
+        }
+
+        setPortfolios(iPortfolio);
       } else {
         console.error(response?.data);
       }
@@ -192,28 +180,6 @@ const Profile = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pagination, refresh]);
 
-  // // get portfolio data for update
-  // useEffect(() => {
-  //   let unmounted = false;
-
-  //   const fetchAndSet = async () => {
-  //     const response = await getPortfolioById(id);
-  //     console.log("pID", id);
-
-  //     if (response.success) {
-  //       console.log("response", response.data);
-  //       if (!unmounted) {
-  //         // setFeedback(response?.data);
-  //       }
-  //     }
-  //   };
-
-  //   fetchAndSet();
-  //   return () => {
-  //     unmounted = true;
-  //   };
-  // }, [id, loading]);
-
   return (
     <React.Fragment>
       <Box sx={{ mt: 10, px: 12 }}>
@@ -227,17 +193,14 @@ const Profile = () => {
                 boxshadow="0px 8px 25px rgba(0, 0, 0, 0.15)"
                 image={personImage}
               />
+              <Box></Box>
             </Card>
           </Grid>
           <Grid item xs={8}>
             <Typography variant="h5" sx={{ fontWeight: "bold" }}>
               {authState.user.name}
             </Typography>
-            <Typography>
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec vel
-              egestas dolor, nec dignissim metus. Donec augue elit, rhoncus ac
-              sodales id, porttitor vitae est. Donec laoreet rutrum
-            </Typography>
+
             <Typography sx={{ fontWeight: "bold", my: 1 }}>
               Address : {authState.user.name}
             </Typography>
@@ -273,7 +236,7 @@ const Profile = () => {
                 portfolios.map((item) => (
                   <Grid item xs={6} key={item._id}>
                     <PortfolioCard
-                      image={item.image.firebaseStorageRef}
+                      image={item.image}
                       description={item.description}
                       handleDelete={() => handlePortfolioDelete(item._id)}
                       handleUpdate={() => handlePortfolioUpdate(item)}
