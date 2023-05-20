@@ -20,3 +20,22 @@ export const signUpUser = async (data) => {
 
   return response;
 };
+
+export const uploadProfileImage = async (data, userId) => {
+  const { profileImg } = data;
+  console.log("supun", profileImg);
+
+  const formData = new FormData();
+  formData.append("profileImg", profileImg);
+
+  const response = await getApiForFormData()
+    .patch(`/users/${userId}/profile-image`, formData)
+    .then((res) => {
+      return buildResponse(true, res.data);
+    })
+    .catch((err) => {
+      return buildResponse(false, err.response.data, err.response.status);
+    });
+
+  return response;
+};

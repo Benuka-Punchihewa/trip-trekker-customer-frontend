@@ -41,10 +41,10 @@ const SignIn = () => {
           navigate("/");
         });
     } else {
-      response?.data && popAlert("Error!", response?.data, "error");
+      setLoading(false);
+      response?.data && popAlert("Error!", response?.data.message, "error");
       response?.data && setErrors(response.data);
     }
-    setLoading(false);
   };
 
   return (
@@ -130,8 +130,7 @@ const SignIn = () => {
                   fullWidth
                   disabled={loading}
                 >
-                  {/* {loading ? <CircularProgress color="#28ac64" /> : "Sign In"} */}
-                  sign in
+                  {loading ? <CircularProgress /> : "Sign In"}
                 </Button>
               </Box>
             </form>

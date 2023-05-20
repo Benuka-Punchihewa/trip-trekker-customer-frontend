@@ -11,6 +11,7 @@ const signUp = {
   tourGuide: {
     certificate: "",
   },
+  profileImg: "",
 };
 
 export default signUp;

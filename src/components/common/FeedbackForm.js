@@ -4,6 +4,7 @@ import colors from "../../assets/Style/colors";
 import RatingModel from "../../models/rating";
 import {
   createAttractionRating,
+  createTourGuideRating,
   createHotelRating,
   updateRating,
 } from "../../service/rating.service";
@@ -12,6 +13,7 @@ import { popAlert } from "../../utils/alerts";
 const FeedbackForm = ({
   hotelid,
   attractionId,
+  userId,
   isUpdate,
   rating,
   onSubmit,
@@ -27,13 +29,16 @@ const FeedbackForm = ({
     if (!isUpdate && attractionId) {
       response = await createAttractionRating(attractionId, inputs);
     }
+    if (!isUpdate && userId) {
+      response = await createTourGuideRating(userId, inputs);
+    }
     if (!isUpdate && hotelid) {
       response = await createHotelRating(hotelid, inputs);
     }
     if (isUpdate && rating) {
       response = await updateRating(rating._id, inputs);
     }
-    
+
     if (response?.success) {
       response?.data &&
         popAlert("Success!", response?.data?.message, "success").then((res) => {
@@ -48,7 +53,7 @@ const FeedbackForm = ({
     setIsLoading(false);
   };
 
-   const handleClearOrCanel = () => {
+  const handleClearOrCanel = () => {
     if (isUpdate) {
       onUpdateCancel();
     }

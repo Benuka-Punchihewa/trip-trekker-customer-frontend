@@ -9,6 +9,7 @@ import {
   TextField,
   CircularProgress,
   Input,
+  IconButton,
 } from "@mui/material";
 import PortfolioCard from "../components/common/PortfolioCard";
 import Popup from "../components/common/Popup";
@@ -23,19 +24,23 @@ import {
 import portfolio from "../models/portfolio";
 import { popAlert, popDangerPrompt } from "../utils/alerts";
 import { getDownloadURLFromFirebaseRef } from "../utils/firebase";
+import EditIcon from "@mui/icons-material/Edit";
+import { uploadProfileImage } from "../service/signUp.service";
+import signUp from "../models/signUp";
 
-//image
-import personImage from "../assets/Images/per3.png";
+import per1 from "../assets/Images/per1.png";
 
 const Profile = () => {
   const authState = useSelector((state) => state.auth);
   const [inputs, setInputs] = useState(portfolio);
+  const [userInputs, setUserInputs] = useState(signUp);
   const [portfolios, setPortfolios] = useState([]);
   const [showPopup, setShowPopup] = useState(false);
   const [updateShowPopup, setUpdateShowPopup] = useState(false);
+  const [ImageShowPopup, setImageShowPopup] = useState(false);
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
-  const [selectedFile, setSelectedFile] = useState(null);
+  const [profileImg, setProfileImg] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [refresh, setRefresh] = useState(false);
   const [pagination, setPagination] = useState({
@@ -131,9 +136,35 @@ const Profile = () => {
     }
   };
 
+  //update priofile Image
+  const handleProfileImage = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    const response = await uploadProfileImage(userInputs, authState.user._id);
+
+    if (response.success) {
+      response?.data &&
+        popAlert("Success!", response?.data?.message, "success").then((res) => {
+          setLoading(false);
+          setShowPopup(false);
+          window.location.reload();
+        });
+    } else {
+      response?.data?.message &&
+        popAlert("Error!", response?.data?.message, "error");
+      response?.data?.data && setErrors(response.data.data);
+      setLoading(false);
+    }
+  };
+
   const handlePopupClose = () => {
     setShowPopup(false);
     setInputs("");
+  };
+
+  const handleProfileImageClose = () => {
+    setImageShowPopup(false);
   };
 
   //get birthday date
@@ -145,6 +176,12 @@ const Profile = () => {
     let unmounted = false;
 
     if (!unmounted) setIsLoading(true);
+
+    const profileFirebaseRef = authState?.user?.profileImg?.firebaseStorageRef;
+    if (profileFirebaseRef) {
+      const url = getDownloadURLFromFirebaseRef(profileFirebaseRef);
+      if (!unmounted) setProfileImg(url);
+    }
 
     const fetchAndSet = async () => {
       const response = await getPortfolios(
@@ -178,22 +215,47 @@ const Profile = () => {
       unmounted = true;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pagination, refresh]);
+  }, [pagination, refresh, authState]);
 
   return (
     <React.Fragment>
       <Box sx={{ mt: 10, px: 12 }}>
         <Grid container spacing={2}>
           <Grid item xs={3}>
-            <Card sx={{ width: "50" }}>
+            <Card sx={{ width: "50", position: "relative" }}>
               <CardMedia
                 component="img"
                 alt="person"
                 height="200"
-                boxshadow="0px 8px 25px rgba(0, 0, 0, 0.15)"
-                image={personImage}
+                image={per1}
+                sx={{
+                  "&:hover": {
+                    opacity: 0.8,
+                  },
+                }}
               />
-              <Box></Box>
+              <Box
+                sx={{
+                  position: "absolute",
+                  top: "50%",
+                  left: "50%",
+                  transform: "translate(-50%, -50%)",
+                  opacity: 0,
+                  transition: "opacity 0.3s",
+                  textAlign: "center",
+                  width: "100%",
+                  p: 12,
+                  color: "white",
+                  backgroundColor: "rgba(0, 0, 0, 0.2)",
+                  "&:hover": {
+                    opacity: 1,
+                  },
+                }}
+              >
+                <IconButton onClick={() => setImageShowPopup(true)}>
+                  <EditIcon />
+                </IconButton>
+              </Box>
             </Card>
           </Grid>
           <Grid item xs={8}>
@@ -370,6 +432,122 @@ const Profile = () => {
               {errors["description"] && (
                 <Typography color="error">{errors["description"]}</Typography>
               )}
+            </Box>
+
+            <Box sx={{ mb: 2, display: "flex", justifyContent: "flex-end" }}>
+              <Button
+                type="reset"
+                variant="contained"
+                onClick={handleClear}
+                sx={{ py: 2, px: 5, mr: 2, backgroundColor: colors.grey }}
+              >
+                Clear
+              </Button>
+              <Button
+                type="submit"
+                variant="contained"
+                sx={{ py: 2, px: 5 }}
+                disabled={loading}
+              >
+                {loading ? <CircularProgress color="secondary" /> : "Save"}
+              </Button>
+            </Box>
+          </form>
+        </Box>
+      </Popup>
+      {/* pop up for update portfolio*/}
+
+      <Popup
+        title="Update the Post"
+        width={800}
+        show={updateShowPopup}
+        onClose={handleUpdatePopupClose}
+      >
+        <Box sx={{ mb: 2 }}>
+          <form onSubmit={handleUpdateSubmit}>
+            <Box sx={{ mb: 2 }}>
+              <Box sx={{ mb: 2 }}>
+                <Input
+                  fullWidth
+                  type="file"
+                  onChange={(e) =>
+                    setInputs({ ...inputs, image: e.target.files[0] })
+                  }
+                />
+              </Box>
+              {/* <Box>
+                {inputs.image && (
+                  <CardMedia
+                    component="img"
+                    image={URL.createObjectURL(inputs.image)}
+                    sx={{ my: 2, maxWidth: "100%" }}
+                  />
+                )}
+              </Box> */}
+
+              <TextField
+                name="description"
+                variant="filled"
+                label="Description"
+                fullWidth
+                multiline
+                maxRows={4}
+                value={inputs.description}
+                onChange={(e) =>
+                  setInputs({
+                    ...inputs,
+                    description: e.target.value,
+                  })
+                }
+              />
+              {errors["description"] && (
+                <Typography color="error">{errors["description"]}</Typography>
+              )}
+            </Box>
+
+            <Box sx={{ mb: 2, display: "flex", justifyContent: "flex-end" }}>
+              <Button
+                type="reset"
+                variant="contained"
+                onClick={handleClear}
+                sx={{ py: 2, px: 5, mr: 2, backgroundColor: colors.grey }}
+              >
+                Clear
+              </Button>
+              <Button
+                type="submit"
+                variant="contained"
+                sx={{ py: 2, px: 5 }}
+                disabled={loading}
+              >
+                {loading ? <CircularProgress color="secondary" /> : "Save"}
+              </Button>
+            </Box>
+          </form>
+        </Box>
+      </Popup>
+
+      {/* pop up for profile Image*/}
+
+      <Popup
+        title="Set Profile Image"
+        width={800}
+        show={ImageShowPopup}
+        onClose={handleProfileImageClose}
+      >
+        <Box sx={{ mb: 2 }}>
+          <form onSubmit={handleProfileImage}>
+            <Box sx={{ mb: 2 }}>
+              <Box sx={{ mb: 2 }}>
+                <Input
+                  fullWidth
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) =>
+                    setInputs({ ...userInputs, profileImg: e.target.files[0] })
+                  }
+                />
+              </Box>
             </Box>
 
             <Box sx={{ mb: 2, display: "flex", justifyContent: "flex-end" }}>
