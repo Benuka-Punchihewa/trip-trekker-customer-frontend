@@ -17,12 +17,11 @@ import Popup from "../components/common/Popup";
 import colors from "../assets/Style/colors";
 import { getTourGuideById } from "../service/tourGuides.service";
 import { getPortfolios } from "../service/portfolio.service";
+import { getDownloadURLFromFirebaseRef } from "../utils/firebase";
+import { useParams } from "react-router";
 
 //image
 import personImage from "../assets/Images/per3.png";
-import portImg1 from "../assets/Images/po1.jpg";
-import portImg2 from "../assets/Images/po2.jpg";
-import { useParams } from "react-router";
 
 const TourGuideDetails = () => {
   const { id } = useParams();
@@ -91,8 +90,16 @@ const TourGuideDetails = () => {
 
       if (response.success) {
         if (!response.data) return;
-        console.log(response.data);
-        setPortfolios(response.data.content);
+
+        const iPortfolio = response?.data?.content || [];
+
+        for (const portfolio of iPortfolio) {
+          const imageRef = portfolio?.image?.firebaseStorageRef;
+          if (imageRef)
+            portfolio.image = await getDownloadURLFromFirebaseRef(imageRef);
+        }
+
+        setPortfolios(iPortfolio);
       } else {
         console.error(response?.data);
       }
@@ -107,8 +114,6 @@ const TourGuideDetails = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pagination, refresh]);
 
-  console.log("user", userData);
-  console.log("portfolios", portfolios);
   return (
     <React.Fragment>
       <Box sx={{ mt: 10, px: 12 }}>
@@ -128,11 +133,7 @@ const TourGuideDetails = () => {
             <Typography variant="h5" sx={{ fontWeight: "bold" }}>
               {userData.name}
             </Typography>
-            <Typography>
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec vel
-              egestas dolor, nec dignissim metus. Donec augue elit, rhoncus ac
-              sodales id, porttitor vitae est. Donec laoreet rutrum
-            </Typography>
+
             <Typography sx={{ fontWeight: "bold" }}>
               Address: {userData.address}
             </Typography>
@@ -157,7 +158,7 @@ const TourGuideDetails = () => {
               portfolios.map((item) => (
                 <Grid item xs={6} key={item._id}>
                   <PortfolioCard
-                    image={item.image.firebaseStorageRef}
+                    image={item.image}
                     description={item.description}
                   />
                 </Grid>
