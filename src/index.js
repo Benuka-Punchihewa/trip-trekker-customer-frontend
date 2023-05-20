@@ -64,7 +64,7 @@ root.render(
                     <Route path="/hotels" element={<Hotels />} />
                     <Route path="/attractions" element={<Attractions />} />
                     <Route path="/tour-guides" element={<TourGuides />} />
-                    <Route path="/hoteldetails" element={<HotelDetails />} />
+                    <Route path="/hotels/:id" element={<HotelDetails />} />
                     <Route
                       path="/attractions/:id"
                       element={<AttractionDetails />}

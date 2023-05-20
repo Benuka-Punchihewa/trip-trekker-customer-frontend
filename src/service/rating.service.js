@@ -63,3 +63,41 @@ export const deleteRating = async (ratingId) => {
 
   return response;
 };
+
+
+export const getPaginatedHotelRatings = async (
+  hotelId,
+  page,
+  limit,
+  orderBy
+) => {
+  const response = await getApi()
+    .get(`/ratings/hotels/${hotelId}`, { 
+      params: {
+        page,
+        limit,
+        orderBy,
+      },
+    })
+    .then((res) => {
+      return buildResponse(true, res.data);
+    })
+    .catch((err) => {
+      return buildResponse(false, err.response.data, err.response.status);
+    });
+
+  return response;
+};
+
+export const createHotelRating = async (hotelId, data) => {
+  const response = await getApi()
+    .post(`/ratings/hotels/${hotelId}`, data)
+    .then((res) => {
+      return buildResponse(true, res.data);
+    })
+    .catch((err) => {
+      return buildResponse(false, err.response.data, err.response.status);
+    });
+
+  return response;
+};
