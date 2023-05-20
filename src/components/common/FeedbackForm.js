@@ -4,12 +4,14 @@ import colors from "../../assets/Style/colors";
 import RatingModel from "../../models/rating";
 import {
   createAttractionRating,
+  createTourGuideRating,
   updateRating,
 } from "../../service/rating.service";
 import { popAlert } from "../../utils/alerts";
 
 const FeedbackForm = ({
   attractionId,
+  userId,
   isUpdate,
   rating,
   onSubmit,
@@ -24,6 +26,9 @@ const FeedbackForm = ({
     let response;
     if (!isUpdate && attractionId) {
       response = await createAttractionRating(attractionId, inputs);
+    }
+    if (!isUpdate && userId) {
+      response = await createTourGuideRating(userId, inputs);
     }
     if (isUpdate && rating) {
       response = await updateRating(rating._id, inputs);

@@ -181,10 +181,10 @@ const NavBar = () => {
                       {authState.isLoggedIn == false ? (
                         <MenuItem onClick={NavigateSignIn}>Sign In</MenuItem>
                       ) : (
-                        <>
+                        <Box>
                           <MenuItem onClick={NavigateProfile}>Profile</MenuItem>
                           <MenuItem onClick={handleLogout}>Logout</MenuItem>
-                        </>
+                        </Box>
                       )}
                     </Menu>
                   </React.Fragment>

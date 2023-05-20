@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   Typography,
   Box,
@@ -9,6 +9,7 @@ import {
   TextField,
   CircularProgress,
   Input,
+  Pagination,
 } from "@mui/material";
 import PortfolioCard from "../components/common/PortfolioCard";
 import FeedbackForm from "../components/common/FeedbackForm";
@@ -19,13 +20,19 @@ import { getTourGuideById } from "../service/tourGuides.service";
 import { getPortfolios } from "../service/portfolio.service";
 import { getDownloadURLFromFirebaseRef } from "../utils/firebase";
 import { useParams } from "react-router";
+import { popAlert, popDangerPrompt } from "../utils/alerts";
+import { useSelector } from "react-redux";
+import {
+  deleteRating,
+  getPaginatedTourGuideRatings,
+} from "../service/rating.service";
 
-//image
-import personImage from "../assets/Images/per3.png";
+import per1 from "../assets/Images/per1.png";
 
 const TourGuideDetails = () => {
   const { id } = useParams();
-
+  const scrollElmRef = useRef(null);
+  const authState = useSelector((state) => state.auth);
   const [userData, setUserData] = useState("");
   const [portfolios, setPortfolios] = useState([]);
   const [showPopup, setShowPopup] = useState(false);
@@ -38,7 +45,27 @@ const TourGuideDetails = () => {
     page: 1,
     limit: 10,
     orderBy: "desc",
+    totalPages: 0,
   });
+  const [ratingState, setRatingState] = useState({
+    isLoading: false,
+    page: 1,
+    totalPages: 0,
+    content: [],
+    refresh: false,
+  });
+  const [ratingFormState, setRatingFormState] = useState({
+    isUpdateForm: false,
+    activeRating: null,
+  });
+  const [userState, setUserState] = useState({
+    isLoading: true,
+    user: {},
+  });
+
+  const handleChange = (event, value) => {
+    setPagination(value);
+  };
 
   const handlePopupClose = () => {
     setShowPopup(false);
@@ -51,6 +78,63 @@ const TourGuideDetails = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+  };
+
+  const handleRatingSubmit = () => {
+    setRatingState({
+      ...ratingState,
+      refresh: !ratingState.refresh,
+    });
+    setRatingFormState({
+      ...ratingFormState,
+      isUpdateForm: false,
+      activeRating: {},
+    });
+  };
+
+  const handleRatingUpdateClick = (rating) => {
+    setRatingFormState({
+      ...ratingFormState,
+      isUpdateForm: true,
+      activeRating: rating,
+    });
+
+    // scroll to view
+    scrollElmRef.current.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+      inline: "nearest",
+    });
+  };
+
+  const handleRatingDeleteClick = (rating) => {
+    popDangerPrompt(
+      "Warning",
+      "Are you sure you want to delete this?",
+      "error"
+    ).then(async (res) => {
+      if (res.isConfirmed) {
+        const response = await deleteRating(rating._id);
+        if (response.success) {
+          popAlert("Success!", "Successfully deleted the rating!", "success");
+          setRatingState({
+            ...ratingState,
+            refresh: !ratingState.refresh,
+          });
+        } else {
+          response?.data &&
+            popAlert("Error!", response?.data?.message, "error");
+        }
+      }
+    });
+  };
+
+  const handleRatingUpdateCancel = () => {
+    setRatingFormState({
+      ...ratingFormState,
+      isUpdateForm: false,
+      activeRating: {},
+    });
   };
 
   //get user data
@@ -98,7 +182,7 @@ const TourGuideDetails = () => {
           if (imageRef)
             portfolio.image = await getDownloadURLFromFirebaseRef(imageRef);
         }
-
+        setPagination({ ...pagination, totalPages: response.data.totalPages });
         setPortfolios(iPortfolio);
       } else {
         console.error(response?.data);
@@ -112,7 +196,50 @@ const TourGuideDetails = () => {
       unmounted = true;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pagination, refresh]);
+  }, [id, pagination, refresh]);
+
+  useEffect(
+    () => {
+      let unmounted = false;
+      if (!userData._id) return;
+
+      console.log(userState);
+
+      const fetchAndSet = async () => {
+        setRatingState({
+          ...ratingState,
+          isLoading: true,
+        });
+        const response = await getPaginatedTourGuideRatings(
+          userData._id,
+          ratingState.page,
+          6,
+          "desc"
+        );
+
+        if (response.success) {
+          if (!unmounted) {
+            setRatingState({
+              ...ratingState,
+              content: response.data?.content || [],
+              totalPages: response?.data?.totalPages || 0,
+              isLoading: false,
+            });
+          }
+        } else {
+          console.log(response.data);
+        }
+      };
+
+      fetchAndSet();
+
+      return () => {
+        unmounted = true;
+      };
+    },
+    // eslint-disable-next-line
+    [ratingState.refresh, userData, ratingState.page]
+  );
 
   return (
     <React.Fragment>
@@ -125,7 +252,7 @@ const TourGuideDetails = () => {
                 alt="person"
                 height="200"
                 boxshadow="0px 8px 25px rgba(0, 0, 0, 0.15)"
-                image={personImage}
+                image={per1}
               />
             </Card>
           </Grid>
@@ -164,22 +291,56 @@ const TourGuideDetails = () => {
                 </Grid>
               ))}
           </Grid>
+          <Box
+            sx={{
+              width: "100%",
+              display: "flex",
+              justifyContent: "right",
+              mt: 4,
+            }}
+          >
+            <Pagination
+              count={pagination.totalPages}
+              page={pagination.page}
+              onChange={handleChange}
+              fontWeight={"bold"}
+            />
+          </Box>
         </Box>
         <Grid container spacing={2} sx={{ mt: 4 }}>
           <Grid item xs={8} sx={{ mb: 2 }}>
+            <div
+              ref={scrollElmRef}
+              style={{
+                position: "absolute",
+                marginTop: "-100px",
+                height: 100,
+              }}
+            />
             <Typography variant="h5" sx={{ fontWeight: "bold" }}>
               Ratings & Reviews
             </Typography>
           </Grid>
           <Grid item xs={6}>
-            <FeedbackForm />
-            <Feedbacks />
-            <Feedbacks />
-            <Feedbacks />
+            {authState.isLoggedIn && (
+              <FeedbackForm
+                userId={userData._id}
+                onSubmit={handleRatingSubmit}
+                isUpdate={ratingFormState.isUpdateForm}
+                rating={ratingFormState.activeRating}
+                onUpdateCancel={handleRatingUpdateCancel}
+              />
+            )}
+            {ratingState?.content?.map((rating) => (
+              <Feedbacks
+                key={rating._id}
+                rating={rating}
+                onUpdateClick={handleRatingUpdateClick}
+                onDeleteClick={handleRatingDeleteClick}
+              />
+            ))}
           </Grid>
-          <Grid item xs={6}>
-            Random Attractions
-          </Grid>
+          <Grid item xs={6}></Grid>
         </Grid>
       </Box>
 

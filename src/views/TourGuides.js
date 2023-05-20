@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 
-import { Typography, Box, CardMedia } from "@mui/material";
+import { Typography, Box, CardMedia, Pagination } from "@mui/material";
 import guideImage from "../assets/Images/guide1.png";
 
 import Grid from "@mui/material/Grid";
@@ -9,7 +9,6 @@ import MediaCard from "../components/common/MediaCard";
 import { useNavigate } from "react-router-dom";
 import { getAllTourGuides } from "../service/tourGuides.service";
 
-//images
 import per1 from "../assets/Images/per1.png";
 
 const TourGuides = () => {
@@ -17,7 +16,9 @@ const TourGuides = () => {
     page: 1,
     limit: 10,
     orderBy: "desc",
+    totalPages: 0,
   });
+
   const [isLoading, setIsLoading] = useState(false);
   const [refresh, setRefresh] = useState(false);
   const [keyword, setKeyword] = useState("");
@@ -26,6 +27,14 @@ const TourGuides = () => {
 
   const handleItemClick = (id) => {
     navigate(`/tour-guides/${id}`);
+  };
+
+  const handleChange = (event, value) => {
+    setPagination(value);
+  };
+
+  const handleSearch = (input) => {
+    setKeyword(input);
   };
 
   useEffect(() => {
@@ -43,7 +52,7 @@ const TourGuides = () => {
 
       if (response.success) {
         if (!response.data) return;
-
+        setPagination({ ...pagination, totalPages: response.data.totalPages });
         setTourGuides(response.data.content);
       } else {
         console.error(response?.data);
@@ -73,7 +82,7 @@ const TourGuides = () => {
               width: "60%",
             }}
           >
-            <SearchBar />
+            <SearchBar onSearch={handleSearch} />
           </Box>
         </Box>
         <Box
@@ -109,6 +118,21 @@ const TourGuides = () => {
                   </Grid>
                 ))}
             </Grid>
+          </Box>
+          <Box
+            sx={{
+              width: "100%",
+              display: "flex",
+              justifyContent: "right",
+              mt: 4,
+            }}
+          >
+            <Pagination
+              count={pagination.totalPages}
+              page={pagination.page}
+              onChange={handleChange}
+              fontWeight={"bold"}
+            />
           </Box>
         </Box>
       </Box>
