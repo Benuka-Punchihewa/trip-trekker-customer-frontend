@@ -66,12 +66,38 @@ export const deleteRating = async (ratingId) => {
 
 export const getPaginatedTourGuideRatings = async (
   userId,
+   page,
+  limit,
+  orderBy
+) => {
+  const response = await getApi()
+   .get(`/ratings/users/${userId}`, { 
+      params: {
+        page,
+        limit,
+        orderBy,
+      },
+    })
+    .then((res) => {
+      return buildResponse(true, res.data);
+    })
+    .catch((err) => {
+      return buildResponse(false, err.response.data, err.response.status);
+    });
+
+  return response;
+};
+
+
+export const getPaginatedHotelRatings = async (
+  hotelId,
   page,
   limit,
   orderBy
 ) => {
   const response = await getApi()
-    .get(`/ratings/users/${userId}`, {
+   
+    .get(`/ratings/hotels/${hotelId}`, { 
       params: {
         page,
         limit,
@@ -91,6 +117,19 @@ export const getPaginatedTourGuideRatings = async (
 export const createTourGuideRating = async (userId, data) => {
   const response = await getApi()
     .post(`/ratings/users/${userId}`, data)
+     .then((res) => {
+      return buildResponse(true, res.data);
+    })
+    .catch((err) => {
+      return buildResponse(false, err.response.data, err.response.status);
+    });
+
+  return response;
+}
+
+export const createHotelRating = async (hotelId, data) => {
+  const response = await getApi()
+    .post(`/ratings/hotels/${hotelId}`, data)
     .then((res) => {
       return buildResponse(true, res.data);
     })

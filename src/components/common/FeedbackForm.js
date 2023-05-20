@@ -5,11 +5,13 @@ import RatingModel from "../../models/rating";
 import {
   createAttractionRating,
   createTourGuideRating,
+  createHotelRating,
   updateRating,
 } from "../../service/rating.service";
 import { popAlert } from "../../utils/alerts";
 
 const FeedbackForm = ({
+  hotelid,
   attractionId,
   userId,
   isUpdate,
@@ -29,6 +31,9 @@ const FeedbackForm = ({
     }
     if (!isUpdate && userId) {
       response = await createTourGuideRating(userId, inputs);
+    }
+    if (!isUpdate && hotelid) {
+      response = await createHotelRating(hotelid, inputs);
     }
     if (isUpdate && rating) {
       response = await updateRating(rating._id, inputs);
