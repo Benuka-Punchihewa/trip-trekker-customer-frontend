@@ -304,6 +304,8 @@ const HotelDetails = () => {
     [hotelsState.hotel]
   );
 
+  console.log("hotelsState",hotelsState);
+
   if (hotelsState.isLoading)
     return (
       <Box sx={{
@@ -363,17 +365,18 @@ const HotelDetails = () => {
               />
             </Box>
 
-             <Box>
+            <Box>
+              
             <Typography variant="h4" sx={{ fontWeight: "bold",mt:2}}>
               Facilities
             </Typography>
               <Box>
-                 <Facilities
-                  name1={hotelsState?.hotel.hotelFacilities[0]}
-                  name2={hotelsState?.hotel.hotelFacilities[1]}
-                  name3={hotelsState?.hotel.hotelFacilities[2]}
-                  name4={hotelsState?.hotel.hotelFacilities[3]}
-                  name5={hotelsState?.hotel.hotelFacilities[4]}/> 
+               <div class="container" style={{  display:"flex", flexWrap:"wrap" }}>
+                 {hotelsState.hotel?.hotelFacilities?.map((hotelFacility) => (
+                   <div class="item" style={{ margin: "5px", padding: "8px 12px", backgroundColor: "#e0e0e0", borderRadius: "16px" }}>{hotelFacility}</div>
+                 ))} 
+                </div>
+                
               </Box>
             </Box> 
 
