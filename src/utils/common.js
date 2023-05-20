@@ -5,7 +5,7 @@ export const getStrigifiedStringArrayItems = (arr) => {
 
 export const getTimePassed = (time) => {
   if (!time) return "";
-
+  console.log(time);
   const currentDate = new Date();
   const pastDate = new Date(time);
 

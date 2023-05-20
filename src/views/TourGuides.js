@@ -2,8 +2,7 @@ import React, { useState, useEffect } from "react";
 
 import { Typography, Box, CardMedia } from "@mui/material";
 import guideImage from "../assets/Images/guide1.png";
-import { styled } from "@mui/material/styles";
-import Paper from "@mui/material/Paper";
+
 import Grid from "@mui/material/Grid";
 import SearchBar from "../components/common/SearchBar";
 import MediaCard from "../components/common/MediaCard";
@@ -44,7 +43,7 @@ const TourGuides = () => {
 
       if (response.success) {
         if (!response.data) return;
-        console.log(response.data);
+
         setTourGuides(response.data.content);
       } else {
         console.error(response?.data);
@@ -96,30 +95,19 @@ const TourGuides = () => {
               justifyContent: "center",
             }}
           >
-            <Grid container spacing={4} style={{ maxWidth: 1300 }}>
+            <Grid container spacing={4}>
               {tourGuides &&
                 tourGuides.map((item) => (
                   <Grid
                     item
-                    xs={3}
+                    md={4}
+                    lg={3}
                     key={item._id}
                     onClick={() => handleItemClick(item._id)}
                   >
                     <MediaCard image={per1} name={item.name} />
                   </Grid>
                 ))}
-              {/* <Grid item xs={3}>
-                <MediaCard image={per1} name={"Name"} />
-              </Grid> */}
-              {/* <Grid item xs={3}>
-                <MediaCard image={per1} name={"Name"} />
-              </Grid>
-              <Grid item xs={3}>
-                <MediaCard image={per1} name={"Name"} />
-              </Grid>
-              <Grid item xs={3}>
-                <MediaCard image={per1} name={"Name"} />
-              </Grid> */}
             </Grid>
           </Box>
         </Box>

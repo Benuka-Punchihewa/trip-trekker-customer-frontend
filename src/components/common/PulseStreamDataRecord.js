@@ -28,11 +28,11 @@ const PulseStreamDataRecord = ({
 
   return (
     <Box sx={{ mb: 1 }}>
-      <Card sx={{ maxWidth: 750 }}>
+      <Card>
         <CardMedia
           component="img"
           alt="green iguana"
-          height="250"
+          height={400}
           sx={{ objectFit: "cover" }}
           image={image}
         />
